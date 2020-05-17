@@ -1,6 +1,8 @@
 package com.example.practicaltouch;
 
+import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -23,7 +25,7 @@ import android.widget.Button;
 import com.example.practicaltouch.ui.main.SectionsPagerAdapter;
 
 public class MainActivity extends AppCompatActivity {
-    boolean started = false;
+    public static boolean started = false;
     AlertDialog alert;
 
     @Override
@@ -43,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
                 start_stop();
             }
         });
+        if (isMyServiceRunning(FloatingWindow.class)) {
+            started = true;
+        }
     }
 
     public void start_stop() {
@@ -89,5 +94,16 @@ public class MainActivity extends AppCompatActivity {
 
         alert = alertBuilder.create();
         alert.show();
+    }
+
+    // Check if bubble is already running
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
