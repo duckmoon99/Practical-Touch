@@ -45,9 +45,6 @@ public class MainActivity extends AppCompatActivity {
                 start_stop();
             }
         });
-        if (isMyServiceRunning(FloatingWindow.class)) {
-            started = true;
-        }
     }
 
     public void start_stop() {
