@@ -154,6 +154,7 @@ public class FloatingWindow extends Service {
     public void onDestroy() {
         super.onDestroy();
         stopSelf();
+        MainActivity.started = false;
 
         try {
             wm.removeView(ll2);
