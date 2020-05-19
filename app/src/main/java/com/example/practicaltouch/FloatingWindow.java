@@ -13,21 +13,15 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import static java.lang.Math.max;
-
 public class FloatingWindow extends Service {
-
-    private final static String TAG1 = "openapp_position";
-    private final static String TAG2 = "distance";
-    WindowManager wm;
-    LinearLayout ll;
-    LinearLayout ll2;
+    WindowManager windowManager;
+    LinearLayout frontLayer;
+    LinearLayout backLayer;
     Point screenSize = new Point();
-    
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -38,13 +32,14 @@ public class FloatingWindow extends Service {
     public void onCreate() {
         super.onCreate();
 
-        wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-        wm.getDefaultDisplay().getSize(screenSize);
-        ll = new LinearLayout(this);
-        ll.setBackgroundColor(Color.TRANSPARENT);
+        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        assert windowManager != null;
+        windowManager.getDefaultDisplay().getSize(screenSize);
+        frontLayer = new LinearLayout(this);
+        frontLayer.setBackgroundColor(Color.TRANSPARENT);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT);
-        ll.setLayoutParams(layoutParams);
+        frontLayer.setLayoutParams(layoutParams);
 
         final WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT,
@@ -53,7 +48,7 @@ public class FloatingWindow extends Service {
                 PixelFormat.TRANSLUCENT);
 
 
-        params.gravity = Gravity.RIGHT | Gravity.TOP;
+        params.gravity = Gravity.END | Gravity.TOP;
         params.x = 16;
         params.y = 16;
 
@@ -63,9 +58,9 @@ public class FloatingWindow extends Service {
                 150,150);
         openapp.setLayoutParams(butnparams);
 
-        ll2 = new LinearLayout(this);
-        ll2.setBackgroundColor(Color.TRANSPARENT);
-        ll2.setLayoutParams(layoutParams);
+        backLayer = new LinearLayout(this);
+        backLayer.setBackgroundColor(Color.TRANSPARENT);
+        backLayer.setLayoutParams(layoutParams);
 
 
         final WindowManager.LayoutParams crossParam = new WindowManager.LayoutParams(
@@ -77,13 +72,13 @@ public class FloatingWindow extends Service {
         final ImageView crossIcon = new ImageView(this);
         crossIcon.setImageResource(R.mipmap.floating_cross_foreground);
         crossIcon.setLayoutParams(new ViewGroup.LayoutParams(200, 200));
-        crossParam.gravity = Gravity.BOTTOM | Gravity.BOTTOM;
+        crossParam.gravity = Gravity.BOTTOM;
         crossParam.x = 16;
         crossParam.y = 16;
 
-        ll.addView(openapp);
-        wm.addView(ll2,crossParam);
-        wm.addView(ll,params);
+        frontLayer.addView(openapp);
+        windowManager.addView(backLayer,crossParam);
+        windowManager.addView(frontLayer,params);
 
         openapp.setOnTouchListener(new View.OnTouchListener() {
             WindowManager.LayoutParams updatepar = params;
@@ -100,13 +95,11 @@ public class FloatingWindow extends Service {
                         y = updatepar.y;
                         px = motionEvent.getRawX();
                         py = motionEvent.getRawY();
-                        ll2.addView(crossIcon);
+                        backLayer.addView(crossIcon);
                         break;
                     case MotionEvent.ACTION_UP:
-                        ll2.removeView(crossIcon);
-                        wm.updateViewLayout(ll,updatepar);
-                        Log.i(TAG2, String.valueOf(screenSize.y - updatepar.y));
-                        Log.i(TAG2, String.valueOf(Math.abs(updatepar.x - screenSize.x/2)));
+                        backLayer.removeView(crossIcon);
+                        windowManager.updateViewLayout(frontLayer,updatepar);
                         if(screenSize.y - updatepar.y <= 400 && Math.abs(updatepar.x - screenSize.x/2) <= 150) {
                             onDestroy();
                         } else {
@@ -115,13 +108,13 @@ public class FloatingWindow extends Service {
                             } else {
                                 updatepar.x = 16;
                             }
-                            wm.updateViewLayout(ll,updatepar);
+                            windowManager.updateViewLayout(frontLayer,updatepar);
                         }
                         break;
                     case MotionEvent.ACTION_MOVE:
                         updatepar.x = (int) (x-(motionEvent.getRawX()-px));
                         updatepar.y = (int) (y+(motionEvent.getRawY()-py));
-                        wm.updateViewLayout(ll,updatepar);
+                        windowManager.updateViewLayout(frontLayer,updatepar);
                         default:
                         break;
                 }
@@ -142,7 +135,7 @@ public class FloatingWindow extends Service {
             public void onClick(View view) {
                 params.x = 16;
                 params.y = 16;
-                wm.updateViewLayout(ll,params);
+                windowManager.updateViewLayout(frontLayer,params);
                 Intent home = new Intent(FloatingWindow.this,MainActivity.class);
                 home.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(home);
@@ -157,8 +150,8 @@ public class FloatingWindow extends Service {
         MainActivity.started = false;
 
         try {
-            wm.removeView(ll2);
+            windowManager.removeView(backLayer);
         } catch (Exception e) {}
-        wm.removeView(ll);
+        windowManager.removeView(frontLayer);
     }
 }
