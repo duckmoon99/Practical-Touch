@@ -2,6 +2,6 @@
     <string name="app_name">Practical Touch</string>
     <string name="tab_text_1">Created Sets</string>
     <string name="tab_text_2">Create New</string>
-    <string name="launch_button">Launch!</string>
+    <string name="launch_button">Launch</string>
     <string name="appicon_desc">The layout for the appicons</string>
 </resources>
