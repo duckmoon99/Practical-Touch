@@ -1,8 +1,10 @@
 package com.example.practicaltouch.ui.main;
 
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -58,7 +60,7 @@ public class SecondFragment extends Fragment {
         GridView appDrawer = getView().findViewById(R.id.myGrid);
         packageManager = Objects.requireNonNull(getActivity()).getPackageManager();
 
-        final List<PackageInfo> installedAppsList = getInstalledApps();
+        final List<ResolveInfo> installedAppsList = getLaunchableApps();
         appDrawer.setAdapter(new AppAdapter(getActivity(), installedAppsList, packageManager));
 
         Point screenSize = new Point();
@@ -68,7 +70,7 @@ public class SecondFragment extends Fragment {
         appDrawer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Drawable icon = packageManager.getApplicationIcon(installedAppsList.get(position).applicationInfo);
+                Drawable icon = packageManager.getApplicationIcon(installedAppsList.get(position).activityInfo.applicationInfo);
                 LayoutInflater inflater = getLayoutInflater();
                 final ImageView view2 = (ImageView) inflater.inflate(R.layout.appicon, parent, false);
                 view2.setImageDrawable(icon);
@@ -82,6 +84,10 @@ public class SecondFragment extends Fragment {
                 });
             }
         });
+    }
+
+    private List<ResolveInfo> getLaunchableApps() {
+        return packageManager.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0);
     }
 
     private boolean isSystemPackage(PackageInfo pkgInfo) {
