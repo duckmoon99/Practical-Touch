@@ -20,7 +20,6 @@ import com.example.practicaltouch.ui.main.SectionsPagerAdapter;
 public class MainActivity extends AppCompatActivity {
     static boolean started = false;
     AlertDialog alert;
-    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,11 +36,9 @@ public class MainActivity extends AppCompatActivity {
     public void start_stop() {
         if (checkPermission()) {
             if (started) {
-                Log.d(TAG, "start_stop: started is true");
                 stopService(new Intent(MainActivity.this, FloatingWindow.class));
                 startService(new Intent(MainActivity.this, FloatingWindow.class));
             } else {
-                Log.d(TAG, "start_stop: started is false");
                 startService(new Intent(MainActivity.this, FloatingWindow.class));
                 started = true;
             }
