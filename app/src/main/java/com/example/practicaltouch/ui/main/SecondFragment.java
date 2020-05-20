@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,6 +32,8 @@ public class SecondFragment extends Fragment {
 
     private LinearLayout appTray;
     private PackageManager packageManager;
+    private Button launchButton;
+    private static final String TAG = "SecondFragment";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,14 +49,6 @@ public class SecondFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        Button launchButton = Objects.requireNonNull(getView()).findViewById(R.id.launchButton);
-        launchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ((MainActivity) Objects.requireNonNull(getActivity())).start_stop();
-            }
-        });
 
         appTray = Objects.requireNonNull(getView()).findViewById(R.id.myLinearLayout);
         GridView appDrawer = getView().findViewById(R.id.myGrid);
@@ -82,6 +78,18 @@ public class SecondFragment extends Fragment {
                 });
             }
         });
+
+        launchButton = getView().findViewById(R.id.launchButton);
+        launchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isListEmpty()) {
+                    appTray.removeAllViews();
+                    ((MainActivity) Objects.requireNonNull(getActivity())).start_stop();
+                    Toast.makeText(getActivity(), "App launched!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private boolean isSystemPackage(PackageInfo pkgInfo) {
@@ -100,6 +108,11 @@ public class SecondFragment extends Fragment {
                 packageList1.add(pi);
             }
         }
+
         return packageList1;
+    }
+
+    private boolean isListEmpty() {
+        return appTray.getChildCount() == 0;
     }
 }

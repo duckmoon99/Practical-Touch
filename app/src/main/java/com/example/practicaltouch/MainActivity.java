@@ -7,17 +7,20 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.annotation.RequiresApi;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.practicaltouch.ui.main.SectionsPagerAdapter;
 
 public class MainActivity extends AppCompatActivity {
-    public static boolean started = false;
+    static boolean started = false;
     AlertDialog alert;
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +37,11 @@ public class MainActivity extends AppCompatActivity {
     public void start_stop() {
         if (checkPermission()) {
             if (started) {
+                Log.d(TAG, "start_stop: started is true");
                 stopService(new Intent(MainActivity.this, FloatingWindow.class));
-                started = false;
+                startService(new Intent(MainActivity.this, FloatingWindow.class));
             } else {
+                Log.d(TAG, "start_stop: started is false");
                 startService(new Intent(MainActivity.this, FloatingWindow.class));
                 started = true;
             }
@@ -51,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         alertBuilder.setTitle("Screen overlay detected");
         alertBuilder.setMessage("Enable 'Draw over other apps' in your system setting.");
         alertBuilder.setPositiveButton("OPEN SETTINGS", new DialogInterface.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -75,6 +81,10 @@ public class MainActivity extends AppCompatActivity {
         }else{
             return true;
         }
+    }
+
+    public static void switchBubbleService(boolean value) {
+        started = value;
     }
 
 }

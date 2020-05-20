@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.os.Build;
 import android.os.IBinder;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -43,7 +44,9 @@ public class FloatingWindow extends Service {
 
         final WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                        ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                        : WindowManager.LayoutParams.TYPE_PHONE),
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
 
@@ -65,7 +68,9 @@ public class FloatingWindow extends Service {
 
         final WindowManager.LayoutParams crossParam = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                        ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                        : WindowManager.LayoutParams.TYPE_PHONE),
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
 
@@ -101,6 +106,7 @@ public class FloatingWindow extends Service {
                         backLayer.removeView(crossIcon);
                         windowManager.updateViewLayout(frontLayer,updatepar);
                         if(screenSize.y - updatepar.y <= 400 && Math.abs(updatepar.x - screenSize.x/2) <= 150) {
+                            MainActivity.switchBubbleService(false);
                             onDestroy();
                         } else {
                             if (updatepar.x >= screenSize.x / 2) {
@@ -147,11 +153,11 @@ public class FloatingWindow extends Service {
     public void onDestroy() {
         super.onDestroy();
         stopSelf();
-        MainActivity.started = false;
-
         try {
             windowManager.removeView(backLayer);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+
+        }
         windowManager.removeView(frontLayer);
     }
 }
