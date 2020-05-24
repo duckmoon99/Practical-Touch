@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,13 +26,16 @@ import com.example.practicaltouch.MainActivity;
 import com.example.practicaltouch.R;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class SecondFragment extends Fragment {
 
     private LinearLayout appTray;
     private PackageManager packageManager;
+    private Set<ResolveInfo> addedApp = new LinkedHashSet<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,7 +56,12 @@ public class SecondFragment extends Fragment {
         launchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) Objects.requireNonNull(getActivity())).start_stop();
+                if (!addedApp.isEmpty()) {
+                    ((MainActivity) Objects.requireNonNull(getActivity())).start_stop(addedApp);
+                } else {
+                    Toast toast = Toast.makeText(getContext(), "Please select at least an application.", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
             }
         });
 
@@ -70,18 +79,23 @@ public class SecondFragment extends Fragment {
         appDrawer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Drawable icon = packageManager.getApplicationIcon(installedAppsList.get(position).activityInfo.applicationInfo);
-                LayoutInflater inflater = getLayoutInflater();
-                final ImageView view2 = (ImageView) inflater.inflate(R.layout.appicon, parent, false);
-                view2.setImageDrawable(icon);
-                view2.setPadding(16,8,16,8);
-                appTray.addView(view2);
-                view2.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        appTray.removeView(view2);
-                    }
-                });
+                final ResolveInfo current = installedAppsList.get(position);
+                if(!addedApp.contains(current)) {
+                    Drawable icon = packageManager.getApplicationIcon(current.activityInfo.applicationInfo);
+                    LayoutInflater inflater = getLayoutInflater();
+                    final ImageView view2 = (ImageView) inflater.inflate(R.layout.appicon, parent, false);
+                    view2.setImageDrawable(icon);
+                    view2.setPadding(16, 8, 16, 8);
+                    appTray.addView(view2);
+                    view2.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            appTray.removeView(view2);
+                            addedApp.remove(current);
+                        }
+                    });
+                    addedApp.add(current);
+                }
             }
         });
     }
