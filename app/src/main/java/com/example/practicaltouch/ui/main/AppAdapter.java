@@ -16,7 +16,7 @@ import com.example.practicaltouch.R;
 import java.util.List;
 
 public class AppAdapter extends BaseAdapter {
-
+    //private List<PackageInfo> packageList;
     private List<ResolveInfo> resolveList;
     private Activity context;
     private PackageManager packageManager;
@@ -66,7 +66,6 @@ public class AppAdapter extends BaseAdapter {
 
         Drawable appIcon = packageManager
                 .getApplicationIcon(resolveInfo.activityInfo.applicationInfo);
-
 
         viewHolder.setImageDrawable(appIcon);
         viewHolder.setPadding(16,8,16,8);
