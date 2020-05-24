@@ -3,6 +3,7 @@ package com.example.practicaltouch;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,8 +18,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.practicaltouch.ui.main.SectionsPagerAdapter;
 
+import java.util.Set;
+
 public class MainActivity extends AppCompatActivity {
-    static boolean started = false;
     AlertDialog alert;
 
     @Override
@@ -33,14 +35,12 @@ public class MainActivity extends AppCompatActivity {
         tabs.setupWithViewPager(viewPager);
     }
 
-    public void start_stop() {
+    public void start_stop(Set<ResolveInfo> s) {
         if (checkPermission()) {
-            if (started) {
+            if (FloatingWindow.hasStarted()) {
                 stopService(new Intent(MainActivity.this, FloatingWindow.class));
-                startService(new Intent(MainActivity.this, FloatingWindow.class));
             } else {
-                startService(new Intent(MainActivity.this, FloatingWindow.class));
-                started = true;
+                startService(new Intent(MainActivity.this, FloatingWindow.class).putExtra("com.example.practicaltouch.addedApp", s.toArray()));
             }
         }else {
             reqPermission();
@@ -71,11 +71,10 @@ public class MainActivity extends AppCompatActivity {
             if (!Settings.canDrawOverlays(this)) {
                 reqPermission();
                 return false;
-            }
-            else {
+            } else {
                 return true;
             }
-        }else{
+        } else {
             return true;
         }
     }

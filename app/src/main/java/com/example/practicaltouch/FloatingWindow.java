@@ -2,6 +2,7 @@ package com.example.practicaltouch;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
@@ -18,10 +19,18 @@ import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 
 public class FloatingWindow extends Service {
+    private static boolean started = false;
     WindowManager windowManager;
     LinearLayout frontLayer;
     LinearLayout backLayer;
     Point screenSize = new Point();
+    ResolveInfo[] appList;
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId){
+        appList = (ResolveInfo[]) intent.getParcelableArrayExtra("com.example.practicaltouch.addedApp");
+        return START_REDELIVER_INTENT;
+    }
 
     @Nullable
     @Override
@@ -33,6 +42,7 @@ public class FloatingWindow extends Service {
     public void onCreate() {
         super.onCreate();
 
+        started = true;
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         assert windowManager != null;
         windowManager.getDefaultDisplay().getSize(screenSize);
@@ -56,6 +66,7 @@ public class FloatingWindow extends Service {
         params.y = 16;
 
         final ImageView openapp = new ImageView(this);
+        assert(appList.length != 0);
         openapp.setImageResource(R.mipmap.ic_launcher_round);
         ViewGroup.LayoutParams butnparams = new ViewGroup.LayoutParams(
                 150,150);
@@ -105,9 +116,8 @@ public class FloatingWindow extends Service {
                     case MotionEvent.ACTION_UP:
                         backLayer.removeView(crossIcon);
                         windowManager.updateViewLayout(frontLayer,updatepar);
-                        if(screenSize.y - updatepar.y <= 400 && Math.abs(updatepar.x - screenSize.x/2) <= 150) {
-                            MainActivity.switchBubbleService(false);
-                            onDestroy();
+                        if(Math.abs(screenSize.y - updatepar.y) <= 450 && Math.abs(updatepar.x - screenSize.x/2) <= 300) {
+                            stopSelf();
                         } else {
                             if (updatepar.x >= screenSize.x / 2) {
                                 updatepar.x = screenSize.x - 170;
@@ -142,7 +152,7 @@ public class FloatingWindow extends Service {
                 params.x = 16;
                 params.y = 16;
                 windowManager.updateViewLayout(frontLayer,params);
-                Intent home = new Intent(FloatingWindow.this,MainActivity.class);
+                Intent home = new Intent(FloatingWindow.this, MainActivity.class);
                 home.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(home);
             }
@@ -152,12 +162,12 @@ public class FloatingWindow extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        stopSelf();
-        try {
-            windowManager.removeView(backLayer);
-        } catch (Exception e) {
-
-        }
+        started = false;
+        windowManager.removeView(backLayer);
         windowManager.removeView(frontLayer);
+    }
+
+    public static boolean hasStarted() {
+        return started;
     }
 }
