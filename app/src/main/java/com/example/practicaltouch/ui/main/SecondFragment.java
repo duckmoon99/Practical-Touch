@@ -1,6 +1,8 @@
 package com.example.practicaltouch.ui.main;
 
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Point;
@@ -33,14 +35,12 @@ import java.util.List;
 import java.util.Objects;
 
 public class SecondFragment extends Fragment {
-    private static final String TAG = "SecondFragment";
 
     private LinearLayout appTray;
     private PackageManager packageManager;
-    private Button launchButton;
     private AppSetViewModel appSetViewModel;
 
-    private List<String> listOfAppIds = new ArrayList<>();
+    private ArrayList<String> listOfAppIds = new ArrayList<>();
 
     @Nullable
     @Override
@@ -51,6 +51,22 @@ public class SecondFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        Button launchButton = Objects.requireNonNull(getView()).findViewById(R.id.launchButton);
+        launchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!listOfAppIds.isEmpty()) {
+                    saveAppSet();
+                    ((MainActivity) Objects.requireNonNull(getActivity())).start_stop(listOfAppIds);
+                    listOfAppIds.clear();
+                    appTray.removeAllViews();
+                    Toast.makeText(getActivity(), "App launched!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "Please select at least an application.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         appSetViewModel = ViewModelProvider.AndroidViewModelFactory
                 .getInstance(Objects.requireNonNull(this.getActivity()).getApplication()).create(AppSetViewModel.class);
@@ -69,39 +85,28 @@ public class SecondFragment extends Fragment {
         appDrawer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Drawable icon = packageManager.getApplicationIcon(installedAppsList.get(position).activityInfo.applicationInfo);
-
                 final String appId = installedAppsList.get(position).activityInfo.packageName;
-                listOfAppIds.add(appId);
 
-                LayoutInflater inflater = getLayoutInflater();
-                final ImageView view2 = (ImageView) inflater.inflate(R.layout.appicon, parent, false);
-                view2.setImageDrawable(icon);
-                view2.setPadding(16,8,16,8);
-                appTray.addView(view2);
-                view2.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        appTray.removeView(view2);
-                        listOfAppIds.remove(appId);
+                if(!listOfAppIds.contains(appId)) {
+                    Drawable icon = null;
+                    try {
+                        icon = packageManager.getApplicationIcon(appId);
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
                     }
-                });
-            }
-        });
-
-
-        launchButton = getView().findViewById(R.id.launchButton);
-        launchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!isListEmpty()) {
-                    saveAppSet();
-
-                    listOfAppIds = new ArrayList<>();
-                    appTray.removeAllViews();
-
-                    ((MainActivity) Objects.requireNonNull(getActivity())).start_stop();
-                    Toast.makeText(getActivity(), "App launched!", Toast.LENGTH_SHORT).show();
+                    LayoutInflater inflater = getLayoutInflater();
+                    final ImageView view2 = (ImageView) inflater.inflate(R.layout.appicon, parent, false);
+                    view2.setImageDrawable(icon);
+                    view2.setPadding(16, 8, 16, 8);
+                    appTray.addView(view2);
+                    view2.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            appTray.removeView(view2);
+                            listOfAppIds.remove(appId);
+                        }
+                    });
+                    listOfAppIds.add(appId);
                 }
             }
         });
@@ -111,8 +116,24 @@ public class SecondFragment extends Fragment {
         return packageManager.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0);
     }
 
-    private boolean isListEmpty() {
-        return appTray.getChildCount() == 0;
+    private boolean isSystemPackage(PackageInfo pkgInfo) {
+        return ((pkgInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
+    }
+
+    private List<PackageInfo> getInstalledApps() {
+        List<PackageInfo> packageList = packageManager
+                .getInstalledPackages(PackageManager.GET_PERMISSIONS);
+
+        final List<PackageInfo> packageList1 = new ArrayList<>();
+
+        /*To filter out System apps*/
+        for(PackageInfo pi : packageList) {
+            if(!isSystemPackage(pi)){
+                packageList1.add(pi);
+            }
+        }
+
+        return packageList1;
     }
 
     private void saveAppSet() {
@@ -122,3 +143,4 @@ public class SecondFragment extends Fragment {
         appSetViewModel.insert(appSet);
     }
 }
+
