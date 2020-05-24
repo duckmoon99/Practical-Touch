@@ -8,7 +8,6 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,13 +57,16 @@ public class SecondFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (!addedApp.isEmpty()) {
+                    appTray.removeAllViews();
                     ((MainActivity) Objects.requireNonNull(getActivity())).start_stop(addedApp);
+                    addedApp.clear();
+                    Toast.makeText(getActivity(), "App launched!", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast toast = Toast.makeText(getContext(), "Please select at least an application.", Toast.LENGTH_SHORT);
-                    toast.show();
+                    Toast.makeText(getActivity(), "Please select at least an application.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
         appTray = Objects.requireNonNull(getView()).findViewById(R.id.myLinearLayout);
         GridView appDrawer = getView().findViewById(R.id.myGrid);
         packageManager = Objects.requireNonNull(getActivity()).getPackageManager();
@@ -95,18 +97,6 @@ public class SecondFragment extends Fragment {
                         }
                     });
                     addedApp.add(current);
-                }
-            }
-        });
-
-        launchButton = getView().findViewById(R.id.launchButton);
-        launchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!isListEmpty()) {
-                    appTray.removeAllViews();
-                    ((MainActivity) Objects.requireNonNull(getActivity())).start_stop();
-                    Toast.makeText(getActivity(), "App launched!", Toast.LENGTH_SHORT).show();
                 }
             }
         });

@@ -8,6 +8,8 @@ import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.Parcelable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,17 +20,21 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 
+import java.util.Arrays;
+
 public class FloatingWindow extends Service {
+    final String tag = "floatingWindow";
+
     private static boolean started = false;
     WindowManager windowManager;
     LinearLayout frontLayer;
     LinearLayout backLayer;
     Point screenSize = new Point();
-    ResolveInfo[] appList;
+    Parcelable[] received;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
-        appList = (ResolveInfo[]) intent.getParcelableArrayExtra("com.example.practicaltouch.addedApp");
+        received = intent.getParcelableArrayExtra("com.example.practicaltouch.addedApp");
         return START_REDELIVER_INTENT;
     }
 
@@ -66,7 +72,7 @@ public class FloatingWindow extends Service {
         params.y = 16;
 
         final ImageView openapp = new ImageView(this);
-        assert(appList.length != 0);
+
         openapp.setImageResource(R.mipmap.ic_launcher_round);
         ViewGroup.LayoutParams butnparams = new ViewGroup.LayoutParams(
                 150,150);

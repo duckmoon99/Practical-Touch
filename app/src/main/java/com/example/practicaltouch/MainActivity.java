@@ -7,6 +7,7 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -40,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
             if (FloatingWindow.hasStarted()) {
                 stopService(new Intent(MainActivity.this, FloatingWindow.class));
             } else {
-                startService(new Intent(MainActivity.this, FloatingWindow.class).putExtra("com.example.practicaltouch.addedApp", s.toArray()));
+                ResolveInfo[] target = new ResolveInfo[0];
+                startService(new Intent(MainActivity.this, FloatingWindow.class).putExtra("com.example.practicaltouch.addedApp", s.toArray(target).clone()));
             }
         }else {
             reqPermission();
@@ -79,8 +81,5 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static void switchBubbleService(boolean value) {
-        started = value;
-    }
 
 }
