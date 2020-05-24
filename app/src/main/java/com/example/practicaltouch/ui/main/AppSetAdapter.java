@@ -21,8 +21,7 @@ import com.example.practicaltouch.database.AppSet;
 import java.util.List;
 
 public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolder> {
-    private static final String TAG = "AppSetAdapter";
-    
+
     private PackageManager packageManager;
     private LayoutInflater layoutInflater;
 
@@ -62,7 +61,6 @@ public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolde
         List<String> listOfAppIds = currentAppSet.getAppIdsList().getListOfAppIds();
         int count = listOfAppIds.size();
         for (int i = 0; i < count; i++) {
-            Log.d(TAG, "onBindViewHolder: " + listOfAppIds.get(i));
             Drawable icon = null;
             try {
                 icon = packageManager.getApplicationIcon(listOfAppIds.get(i));
