@@ -1,8 +1,6 @@
 package com.example.practicaltouch.ui.main;
 
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Point;
@@ -22,24 +20,27 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.practicaltouch.MainActivity;
 import com.example.practicaltouch.R;
+import com.example.practicaltouch.database.AppIdsList;
+import com.example.practicaltouch.database.AppSet;
+import com.example.practicaltouch.database.AppSetViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class SecondFragment extends Fragment {
+    private static final String TAG = "SecondFragment";
 
     private LinearLayout appTray;
     private PackageManager packageManager;
     private Button launchButton;
+    private AppSetViewModel appSetViewModel;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    private List<String> listOfAppIds = new ArrayList<>();
 
     @Nullable
     @Override
@@ -50,6 +51,9 @@ public class SecondFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        appSetViewModel = ViewModelProvider.AndroidViewModelFactory
+                .getInstance(Objects.requireNonNull(this.getActivity()).getApplication()).create(AppSetViewModel.class);
 
         appTray = Objects.requireNonNull(getView()).findViewById(R.id.myLinearLayout);
         GridView appDrawer = getView().findViewById(R.id.myGrid);
@@ -66,6 +70,10 @@ public class SecondFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Drawable icon = packageManager.getApplicationIcon(installedAppsList.get(position).activityInfo.applicationInfo);
+
+                final String appId = installedAppsList.get(position).activityInfo.packageName;
+                listOfAppIds.add(appId);
+
                 LayoutInflater inflater = getLayoutInflater();
                 final ImageView view2 = (ImageView) inflater.inflate(R.layout.appicon, parent, false);
                 view2.setImageDrawable(icon);
@@ -75,17 +83,23 @@ public class SecondFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         appTray.removeView(view2);
+                        listOfAppIds.remove(appId);
                     }
                 });
             }
         });
+
 
         launchButton = getView().findViewById(R.id.launchButton);
         launchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!isListEmpty()) {
+                    saveAppSet();
+
+                    listOfAppIds = new ArrayList<>();
                     appTray.removeAllViews();
+
                     ((MainActivity) Objects.requireNonNull(getActivity())).start_stop();
                     Toast.makeText(getActivity(), "App launched!", Toast.LENGTH_SHORT).show();
                 }
@@ -97,27 +111,14 @@ public class SecondFragment extends Fragment {
         return packageManager.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0);
     }
 
-    private boolean isSystemPackage(PackageInfo pkgInfo) {
-        return ((pkgInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
-    }
-
-    private List<PackageInfo> getInstalledApps() {
-        List<PackageInfo> packageList = packageManager
-                .getInstalledPackages(PackageManager.GET_PERMISSIONS);
-
-        final List<PackageInfo> packageList1 = new ArrayList<>();
-
-        /*To filter out System apps*/
-        for(PackageInfo pi : packageList) {
-            if(!isSystemPackage(pi)){
-                packageList1.add(pi);
-            }
-        }
-
-        return packageList1;
-    }
-
     private boolean isListEmpty() {
         return appTray.getChildCount() == 0;
+    }
+
+    private void saveAppSet() {
+        String defaultText = "My Apps";
+        AppIdsList appIdsList = new AppIdsList(listOfAppIds);
+        AppSet appSet = new AppSet(defaultText, appIdsList);
+        appSetViewModel.insert(appSet);
     }
 }
