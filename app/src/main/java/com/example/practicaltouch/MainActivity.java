@@ -42,8 +42,9 @@ public class MainActivity extends AppCompatActivity {
             if (FloatingWindow.hasStarted()) {
                 stopService(new Intent(MainActivity.this, FloatingWindow.class));
             } else {
-                ResolveInfo[] target = new ResolveInfo[0];
-                startService(new Intent(MainActivity.this, FloatingWindow.class).putExtra("com.example.practicaltouch.addedApp", s.toArray(target).clone()));
+                startService(
+                        new Intent(MainActivity.this, FloatingWindow.class)
+                        .putStringArrayListExtra("com.example.practicaltouch.addedApp", s));
             }
         }else {
             reqPermission();
