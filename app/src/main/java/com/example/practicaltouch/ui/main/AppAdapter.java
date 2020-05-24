@@ -20,7 +20,6 @@ public class AppAdapter extends BaseAdapter {
     private List<ResolveInfo> resolveList;
     private Activity context;
     private PackageManager packageManager;
-    private static final String TAG = "AppAdapter";
 
     AppAdapter(Activity context, List<ResolveInfo> resolveList,
                       PackageManager packageManager) {

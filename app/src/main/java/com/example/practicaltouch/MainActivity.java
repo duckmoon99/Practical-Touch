@@ -8,9 +8,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.annotation.RequiresApi;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         alertBuilder.setTitle("Screen overlay detected");
         alertBuilder.setMessage("Enable 'Draw over other apps' in your system setting.");
         alertBuilder.setPositiveButton("OPEN SETTINGS", new DialogInterface.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -74,6 +77,10 @@ public class MainActivity extends AppCompatActivity {
         } else {
             return true;
         }
+    }
+
+    public static void switchBubbleService(boolean value) {
+        started = value;
     }
 
 }

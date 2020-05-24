@@ -8,6 +8,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,7 +65,6 @@ public class SecondFragment extends Fragment {
                 }
             }
         });
-
         appTray = Objects.requireNonNull(getView()).findViewById(R.id.myLinearLayout);
         GridView appDrawer = getView().findViewById(R.id.myGrid);
         packageManager = Objects.requireNonNull(getActivity()).getPackageManager();
@@ -98,6 +98,18 @@ public class SecondFragment extends Fragment {
                 }
             }
         });
+
+        launchButton = getView().findViewById(R.id.launchButton);
+        launchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isListEmpty()) {
+                    appTray.removeAllViews();
+                    ((MainActivity) Objects.requireNonNull(getActivity())).start_stop();
+                    Toast.makeText(getActivity(), "App launched!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private List<ResolveInfo> getLaunchableApps() {
@@ -120,6 +132,11 @@ public class SecondFragment extends Fragment {
                 packageList1.add(pi);
             }
         }
+
         return packageList1;
+    }
+
+    private boolean isListEmpty() {
+        return appTray.getChildCount() == 0;
     }
 }
