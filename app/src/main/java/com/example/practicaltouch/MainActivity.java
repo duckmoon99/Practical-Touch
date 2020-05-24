@@ -19,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.practicaltouch.ui.main.SectionsPagerAdapter;
 
-import java.util.ArrayList;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -37,14 +36,13 @@ public class MainActivity extends AppCompatActivity {
         tabs.setupWithViewPager(viewPager);
     }
 
-    public void start_stop(ArrayList<String> s) {
+    public void start_stop(Set<ResolveInfo> s) {
         if (checkPermission()) {
             if (FloatingWindow.hasStarted()) {
                 stopService(new Intent(MainActivity.this, FloatingWindow.class));
             } else {
-                startService(
-                        new Intent(MainActivity.this, FloatingWindow.class)
-                        .putStringArrayListExtra("com.example.practicaltouch.addedApp", s));
+                ResolveInfo[] target = new ResolveInfo[0];
+                startService(new Intent(MainActivity.this, FloatingWindow.class).putExtra("com.example.practicaltouch.addedApp", s.toArray(target).clone()));
             }
         }else {
             reqPermission();
