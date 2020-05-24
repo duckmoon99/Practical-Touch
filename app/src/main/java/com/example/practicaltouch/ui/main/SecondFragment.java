@@ -8,6 +8,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,26 +22,25 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.practicaltouch.MainActivity;
 import com.example.practicaltouch.R;
+import com.example.practicaltouch.database.AppIdsList;
+import com.example.practicaltouch.database.AppSet;
+import com.example.practicaltouch.database.AppSetViewModel;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 public class SecondFragment extends Fragment {
 
     private LinearLayout appTray;
     private PackageManager packageManager;
-    private Set<ResolveInfo> addedApp = new LinkedHashSet<>();
+    private AppSetViewModel appSetViewModel;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    private ArrayList<String> listOfAppIds = new ArrayList<>();
 
     @Nullable
     @Override
@@ -56,16 +56,20 @@ public class SecondFragment extends Fragment {
         launchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!addedApp.isEmpty()) {
+                if (!listOfAppIds.isEmpty()) {
+                    saveAppSet();
+                    ((MainActivity) Objects.requireNonNull(getActivity())).start_stop(listOfAppIds);
+                    listOfAppIds.clear();
                     appTray.removeAllViews();
-                    ((MainActivity) Objects.requireNonNull(getActivity())).start_stop(addedApp);
-                    addedApp.clear();
                     Toast.makeText(getActivity(), "App launched!", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getActivity(), "Please select at least an application.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+        appSetViewModel = ViewModelProvider.AndroidViewModelFactory
+                .getInstance(Objects.requireNonNull(this.getActivity()).getApplication()).create(AppSetViewModel.class);
 
         appTray = Objects.requireNonNull(getView()).findViewById(R.id.myLinearLayout);
         GridView appDrawer = getView().findViewById(R.id.myGrid);
@@ -81,9 +85,15 @@ public class SecondFragment extends Fragment {
         appDrawer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final ResolveInfo current = installedAppsList.get(position);
-                if(!addedApp.contains(current)) {
-                    Drawable icon = packageManager.getApplicationIcon(current.activityInfo.applicationInfo);
+                final String appId = installedAppsList.get(position).activityInfo.packageName;
+
+                if(!listOfAppIds.contains(appId)) {
+                    Drawable icon = null;
+                    try {
+                        icon = packageManager.getApplicationIcon(appId);
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
                     LayoutInflater inflater = getLayoutInflater();
                     final ImageView view2 = (ImageView) inflater.inflate(R.layout.appicon, parent, false);
                     view2.setImageDrawable(icon);
@@ -93,10 +103,10 @@ public class SecondFragment extends Fragment {
                         @Override
                         public void onClick(View v) {
                             appTray.removeView(view2);
-                            addedApp.remove(current);
+                            listOfAppIds.remove(appId);
                         }
                     });
-                    addedApp.add(current);
+                    listOfAppIds.add(appId);
                 }
             }
         });
@@ -126,7 +136,11 @@ public class SecondFragment extends Fragment {
         return packageList1;
     }
 
-    private boolean isListEmpty() {
-        return appTray.getChildCount() == 0;
+    private void saveAppSet() {
+        String defaultText = "My Apps";
+        AppIdsList appIdsList = new AppIdsList(listOfAppIds);
+        AppSet appSet = new AppSet(defaultText, appIdsList);
+        appSetViewModel.insert(appSet);
     }
 }
+
