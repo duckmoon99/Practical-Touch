@@ -2,33 +2,38 @@ package com.example.practicaltouch.ui.main;
 
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.practicaltouch.MainActivity;
 import com.example.practicaltouch.R;
 import com.example.practicaltouch.database.AppSet;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolder> {
 
     private PackageManager packageManager;
     private LayoutInflater layoutInflater;
+    private MainActivity activity;
 
-    AppSetAdapter(PackageManager packageManager, LayoutInflater layoutInflater) {
+    AppSetAdapter(PackageManager packageManager, LayoutInflater layoutInflater, FragmentActivity activity) {
         super(DIFF_CALLBACK);
         this.packageManager = packageManager;
         this.layoutInflater = layoutInflater;
+        this.activity = (MainActivity) activity;
     }
 
     private static final DiffUtil.ItemCallback<AppSet> DIFF_CALLBACK = new DiffUtil.ItemCallback<AppSet>() {
@@ -58,7 +63,7 @@ public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolde
 
         holder.appTrayName.setText(currentAppSet.getName());
 
-        List<String> listOfAppIds = currentAppSet.getAppIdsList().getListOfAppIds();
+        final ArrayList<String> listOfAppIds = new ArrayList<>(currentAppSet.getAppIdsList().getListOfAppIds());
         int count = listOfAppIds.size();
         for (int i = 0; i < count; i++) {
             Drawable icon = null;
@@ -72,6 +77,14 @@ public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolde
             view2.setPadding(16,8,16,8);
             holder.appTray.addView(view2);
         }
+
+        holder.launchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.start_stop(listOfAppIds);
+                Toast.makeText(activity, "App launched!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     AppSet getAppSetAt(int position) {
@@ -81,12 +94,13 @@ public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolde
     class AppSetHolder extends RecyclerView.ViewHolder {
         private TextView appTrayName;
         private LinearLayout appTray;
+        private Button launchButton;
 
         AppSetHolder(@NonNull View itemView) {
             super(itemView);
             appTrayName = itemView.findViewById(R.id.appset_name);
             appTray = itemView.findViewById(R.id.appset_linearlayout);
-
+            launchButton = itemView.findViewById(R.id.appset_launchbutton);
         }
     }
 

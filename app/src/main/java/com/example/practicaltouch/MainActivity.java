@@ -3,13 +3,10 @@ package com.example.practicaltouch;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.provider.Settings;
-import android.util.Log;
 
 import com.google.android.material.tabs.TabLayout;
 
@@ -20,7 +17,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.practicaltouch.ui.main.SectionsPagerAdapter;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
     AlertDialog alert;
@@ -41,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         if (checkPermission()) {
             if (FloatingWindow.hasStarted()) {
                 stopService(new Intent(MainActivity.this, FloatingWindow.class));
+                startService(new Intent(MainActivity.this, FloatingWindow.class)
+                .putStringArrayListExtra("com.example.practicaltouch.addedApp", s));
             } else {
                 startService(
                         new Intent(MainActivity.this, FloatingWindow.class)

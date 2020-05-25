@@ -1,14 +1,11 @@
 package com.example.practicaltouch.ui.main;
 
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,26 +111,6 @@ public class SecondFragment extends Fragment {
 
     private List<ResolveInfo> getLaunchableApps() {
         return packageManager.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0);
-    }
-
-    private boolean isSystemPackage(PackageInfo pkgInfo) {
-        return ((pkgInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
-    }
-
-    private List<PackageInfo> getInstalledApps() {
-        List<PackageInfo> packageList = packageManager
-                .getInstalledPackages(PackageManager.GET_PERMISSIONS);
-
-        final List<PackageInfo> packageList1 = new ArrayList<>();
-
-        /*To filter out System apps*/
-        for(PackageInfo pi : packageList) {
-            if(!isSystemPackage(pi)){
-                packageList1.add(pi);
-            }
-        }
-
-        return packageList1;
     }
 
     private void saveAppSet() {
