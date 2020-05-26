@@ -61,6 +61,7 @@ public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolde
     public void onBindViewHolder(@NonNull AppSetHolder holder, int position) {
         AppSet currentAppSet = getItem(position);
 
+        holder.appTray.removeAllViews();
         holder.appTrayName.setText(currentAppSet.getName());
 
         final ArrayList<String> listOfAppIds = new ArrayList<>(currentAppSet.getAppIdsList().getListOfAppIds());
