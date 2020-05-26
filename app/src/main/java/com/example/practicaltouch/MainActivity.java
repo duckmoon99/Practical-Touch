@@ -41,12 +41,12 @@ public class MainActivity extends AppCompatActivity {
         if (checkPermission()) {
             if (FloatingWindow.hasStarted()) {
                 stopService(new Intent(MainActivity.this, FloatingWindow.class));
-            } else {
-                startService(
-                        new Intent(MainActivity.this, FloatingWindow.class)
-                        .putStringArrayListExtra("com.example.practicaltouch.addedApp", s));
             }
-        }else {
+            startService(
+                    new Intent(MainActivity.this, FloatingWindow.class)
+                            .putStringArrayListExtra("com.example.practicaltouch.addedApp", s));
+
+        } else {
             reqPermission();
         }
     }
