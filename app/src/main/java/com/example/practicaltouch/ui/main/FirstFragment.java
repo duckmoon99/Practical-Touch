@@ -45,7 +45,7 @@ public class FirstFragment extends Fragment {
         LayoutInflater layoutInflater = getLayoutInflater();
 
         final AppSetAdapter appSetAdapter =
-                new AppSetAdapter(packageManager, layoutInflater);
+                new AppSetAdapter(packageManager, layoutInflater, getActivity());
         recyclerView.setAdapter(appSetAdapter);
 
         appSetViewModel = ViewModelProvider.AndroidViewModelFactory
