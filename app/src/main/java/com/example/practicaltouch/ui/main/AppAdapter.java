@@ -1,7 +1,6 @@
 package com.example.practicaltouch.ui.main;
 
 import android.app.Activity;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;

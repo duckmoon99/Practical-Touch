@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -45,7 +44,7 @@ public class FirstFragment extends Fragment {
         LayoutInflater layoutInflater = getLayoutInflater();
 
         final AppSetAdapter appSetAdapter =
-                new AppSetAdapter(packageManager, layoutInflater);
+                new AppSetAdapter(packageManager, layoutInflater, getActivity());
         recyclerView.setAdapter(appSetAdapter);
 
         appSetViewModel = ViewModelProvider.AndroidViewModelFactory
