@@ -14,7 +14,7 @@ public class BubbleImageView extends ImageView {
         super(context);
         open = false;
         setImageResource(R.mipmap.logo_foreground);
-        setLayoutParams(new ViewGroup.LayoutParams(250, 250));
+        setLayoutParams(new ViewGroup.LayoutParams(180, 180));
         setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view){
