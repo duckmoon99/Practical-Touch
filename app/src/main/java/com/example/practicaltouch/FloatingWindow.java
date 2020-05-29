@@ -77,7 +77,7 @@ public class FloatingWindow extends Service {
                                 stopSelf();
                             } else {
                                 if (updatepar.x >= screenSize.x / 2) {
-                                    updatepar.x = screenSize.x - 230;
+                                    updatepar.x = screenSize.x - 150;
                                 } else {
                                     updatepar.x = 0;
                                 }

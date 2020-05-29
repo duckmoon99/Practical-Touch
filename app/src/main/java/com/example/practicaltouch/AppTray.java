@@ -17,19 +17,19 @@ public class AppTray extends LinearLayout {
             ImageView current = new ImageView(context);
             try {
                 current.setImageDrawable(packageManager.getApplicationIcon(s));
+                current.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent startApp = packageManager.getLaunchIntentForPackage(s);
+                        context.startActivity(startApp);
+                    }
+                });
+                current.setLayoutParams(new ViewGroup.LayoutParams(180, 180));
+                current.setPadding(16, 0, 16, 0);
+                addView(current);
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
-            current.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent startApp = packageManager.getLaunchIntentForPackage(s);
-                    context.startActivity(startApp);
-                }
-            });
-            current.setLayoutParams(new ViewGroup.LayoutParams(180, 180));
-            current.setPadding(16, 0, 16, 0);
-            addView(current);
         }
     }
 }
