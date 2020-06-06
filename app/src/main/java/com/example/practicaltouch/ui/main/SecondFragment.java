@@ -8,7 +8,6 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -113,10 +112,13 @@ public class SecondFragment extends Fragment {
             }
         });
 
-        scroll.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+        appTray.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                scroll.fullScroll(View.FOCUS_RIGHT);
+                int lengthChange = right - oldRight;
+                if (lengthChange > 0) {
+                    scroll.fullScroll(View.FOCUS_RIGHT);
+                }
             }
         });
     }
