@@ -8,13 +8,13 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -74,6 +74,7 @@ public class SecondFragment extends Fragment {
         appTray = Objects.requireNonNull(getView()).findViewById(R.id.myLinearLayout);
         GridView appDrawer = getView().findViewById(R.id.myGrid);
         packageManager = Objects.requireNonNull(getActivity()).getPackageManager();
+        final HorizontalScrollView scroll = getView().findViewById(R.id.scroll);
 
         final List<ResolveInfo> installedAppsList = getLaunchableApps();
         appDrawer.setAdapter(new AppAdapter(getActivity(), installedAppsList, packageManager));
@@ -107,6 +108,16 @@ public class SecondFragment extends Fragment {
                         }
                     });
                     listOfAppIds.add(appId);
+                }
+            }
+        });
+
+        appTray.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                int lengthChange = right - oldRight;
+                if (lengthChange > 0) {
+                    scroll.fullScroll(View.FOCUS_RIGHT);
                 }
             }
         });
