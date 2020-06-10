@@ -38,4 +38,7 @@ public class AppSetViewModel extends AndroidViewModel {
         return allAppSets;
     }
 
+    public void insertNewAppSet() {
+
+    }
 }

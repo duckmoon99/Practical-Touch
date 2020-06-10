@@ -16,27 +16,30 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.practicaltouch.R;
 import com.example.practicaltouch.database.AppSet;
 import com.example.practicaltouch.database.AppSetViewModel;
+import com.example.practicaltouch.databinding.FragmentCreatedsetsTabBinding;
 
 import java.util.List;
 import java.util.Objects;
 
 public class FirstFragment extends Fragment {
+
+    private FragmentCreatedsetsTabBinding binding;
     private AppSetViewModel appSetViewModel;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_createdsets_tab, container, false);
+        binding = FragmentCreatedsetsTabBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        RecyclerView recyclerView = Objects.requireNonNull(getView()).findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = binding.recyclerView;
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setHasFixedSize(true);
 
@@ -69,8 +72,12 @@ public class FirstFragment extends Fragment {
                 Toast.makeText(getActivity(), "AppSet deleted", Toast.LENGTH_SHORT).show();
             }
         }).attachToRecyclerView(recyclerView);
+
     }
 
-
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 }

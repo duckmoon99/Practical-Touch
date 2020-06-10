@@ -13,13 +13,11 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.practicaltouch.database.AppSetViewModel;
-import com.google.android.material.tabs.TabLayout;
+import com.example.practicaltouch.databinding.ActivityMainBinding;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.practicaltouch.ui.main.SectionsPagerAdapter;
@@ -27,24 +25,26 @@ import com.example.practicaltouch.ui.main.SectionsPagerAdapter;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    AlertDialog alert;
+
+    ActivityMainBinding binding;
     AppSetViewModel appSetViewModel;
+    AlertDialog alert;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
-        ViewPager viewPager = findViewById(R.id.view_pager);
-        viewPager.setAdapter(sectionsPagerAdapter);
-        TabLayout tabs = findViewById(R.id.tabs);
-        tabs.setupWithViewPager(viewPager);
+        binding.viewPager.setAdapter(sectionsPagerAdapter);
+        binding.tabs.setupWithViewPager(binding.viewPager);
+
+        setSupportActionBar(binding.toolbar);
 
         appSetViewModel = ViewModelProvider.AndroidViewModelFactory
                 .getInstance(getApplication()).create(AppSetViewModel.class);
-        Toolbar toolbar =  findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
     }
 
     public void start_stop(ArrayList<String> s) {
