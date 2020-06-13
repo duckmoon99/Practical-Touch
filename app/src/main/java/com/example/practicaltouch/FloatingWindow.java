@@ -1,5 +1,9 @@
 package com.example.practicaltouch;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,6 +13,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,11 +24,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 
 import java.util.ArrayList;
 
 public class FloatingWindow extends Service {
     final String tag = "floatingWindow";
+    private static String CHANNEL_ID = "com.example.practicaltouch.channel";
 
     private static boolean started = false;
     WindowManager windowManager;
@@ -40,9 +47,32 @@ public class FloatingWindow extends Service {
     WindowManager.LayoutParams params;
     private PackageManager packageManager;
 
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
         started = true;
+
+        NotificationChannel channel = null;
+        Intent homeIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, homeIntent, 0);
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            String name = "Status";
+            String description = "Shows if Practical Touch is running.";
+            channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            getSystemService(NotificationManager.class).createNotificationChannel(channel);
+        }
+
+        Notification notification = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                .setSmallIcon(R.mipmap.logo_foreground)
+                .setContentTitle("Practical Touch")
+                .setContentText("Practical Touch is running.")
+                .setContentIntent(pendingIntent)
+                .build();
+
+        startForeground(1, notification);
 
         appList = intent.getStringArrayListExtra("com.example.practicaltouch.addedApp");
         assert appList != null;
@@ -70,28 +100,23 @@ public class FloatingWindow extends Service {
                         backLayer.addView(crossIcon);
                         break;
                     case MotionEvent.ACTION_UP:
-                        if (moved) {
-                            backLayer.removeView(crossIcon);
-                            windowManager.updateViewLayout(frontLayer, updatepar);
-                            if (Math.abs(screenSize.y - updatepar.y) <= 350 && Math.abs(updatepar.x - screenSize.x / 2) <= 300) {
-                                stopSelf();
-                            } else {
-                                if (updatepar.x >= screenSize.x / 2) {
-                                    updatepar.x = screenSize.x - 150;
-                                } else {
-                                    updatepar.x = 0;
-                                }
-                                windowManager.updateViewLayout(frontLayer, updatepar);
-                            }
+                        backLayer.removeView(crossIcon);
+                        windowManager.updateViewLayout(frontLayer, updatepar);
+                        if (Math.abs(screenSize.y - updatepar.y) <= 350 && Math.abs(updatepar.x - screenSize.x / 2) <= 300) {
+                            stopSelf();
                         } else {
-                            openapp.performClick();
+                            if (updatepar.x >= screenSize.x / 2) {
+                                updatepar.x = screenSize.x - 150;
+                            } else {
+                                updatepar.x = 0;
+                            }
+                            windowManager.updateViewLayout(frontLayer, updatepar);
                         }
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        moved = true;
                         updatepar.x = (int) (x-(motionEvent.getRawX()-px));
                         updatepar.y = (int) (y+(motionEvent.getRawY()-py));
-                        windowManager.updateViewLayout(frontLayer,updatepar);
+                        windowManager.updateViewLayout(frontLayer, updatepar);
                     default:
                         break;
                 }
@@ -115,7 +140,6 @@ public class FloatingWindow extends Service {
         appTrayContainer = new HorizontalScrollView(this);
 
         trayLayer.addView(appTrayContainer);
-
         return START_REDELIVER_INTENT;
     }
 
