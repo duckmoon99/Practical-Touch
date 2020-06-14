@@ -13,38 +13,42 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.practicaltouch.database.AppSetViewModel;
-import com.google.android.material.tabs.TabLayout;
+import com.example.practicaltouch.databinding.ActivityMainBinding;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.practicaltouch.ui.main.SectionsPagerAdapter;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
-    AlertDialog alert;
+public class MainActivity extends AppCompatActivity{
+
+    ActivityMainBinding binding;
     AppSetViewModel appSetViewModel;
+    AlertDialog alert;
+    private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
-        ViewPager viewPager = findViewById(R.id.view_pager);
-        viewPager.setAdapter(sectionsPagerAdapter);
-        TabLayout tabs = findViewById(R.id.tabs);
-        tabs.setupWithViewPager(viewPager);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this);
+        binding.viewPager.setAdapter(sectionsPagerAdapter);
+        new TabLayoutMediator(binding.tabs, binding.viewPager, (tab, position) -> tab.setText(TAB_TITLES[position])).attach();
+
+        setSupportActionBar(binding.toolbar);
 
         appSetViewModel = ViewModelProvider.AndroidViewModelFactory
                 .getInstance(getApplication()).create(AppSetViewModel.class);
-        Toolbar toolbar =  findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
     }
 
     public void start_stop(ArrayList<String> s) {
@@ -71,14 +75,11 @@ public class MainActivity extends AppCompatActivity {
         alertBuilder.setCancelable(true);
         alertBuilder.setTitle("Screen overlay detected");
         alertBuilder.setMessage("Enable 'Draw over other apps' in your system setting.");
-        alertBuilder.setPositiveButton("OPEN SETTINGS", new DialogInterface.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent,RESULT_OK);
-            }
+        alertBuilder.setPositiveButton("OPEN SETTINGS", (dialog, which) -> {
+            // warning below
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent,RESULT_OK);
         });
 
         alert = alertBuilder.create();
@@ -116,5 +117,9 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public AppSetViewModel getAppSetViewModel() {
+        return appSetViewModel;
     }
 }
