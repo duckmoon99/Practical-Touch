@@ -11,11 +11,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.practicaltouch.MainActivity;
 import com.example.practicaltouch.database.AppSet;
 import com.example.practicaltouch.database.AppSetViewModel;
 import com.example.practicaltouch.databinding.FragmentCreatedsetsTabBinding;
@@ -32,6 +32,7 @@ public class FirstFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentCreatedsetsTabBinding.inflate(inflater, container, false);
+        appSetViewModel = ((MainActivity) Objects.requireNonNull(getActivity())).getAppSetViewModel();
         return binding.getRoot();
     }
 
@@ -50,14 +51,11 @@ public class FirstFragment extends Fragment {
                 new AppSetAdapter(packageManager, layoutInflater, getActivity());
         recyclerView.setAdapter(appSetAdapter);
 
-        appSetViewModel = ViewModelProvider.AndroidViewModelFactory
-                .getInstance(this.getActivity().getApplication()).create(AppSetViewModel.class);
-        appSetViewModel.getAllAppSets().observe(getViewLifecycleOwner(), new Observer<List<AppSet>>() {
-            @Override
-            public void onChanged(List<AppSet> appSets) {
-                appSetAdapter.submitList(appSets);
-            }
-        });
+//        Log.d(TAG, "onViewCreated: BEFORE VIEWMODEL created");
+//        appSetViewModel = ViewModelProvider.AndroidViewModelFactory
+//                .getInstance(this.getActivity().getApplication()).create(AppSetViewModel.class);
+//        Log.d(TAG, "onViewCreated: AFTER VIEWMODEL created");
+        appSetViewModel.getAllAppSets().observe(getViewLifecycleOwner(), appSetAdapter::submitList);
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -73,6 +71,13 @@ public class FirstFragment extends Fragment {
             }
         }).attachToRecyclerView(recyclerView);
 
+        appSetViewModel.getScrollBool().observe(getViewLifecycleOwner(), aBoolean -> {
+            if (aBoolean) {
+                Objects.requireNonNull(binding.recyclerView.getLayoutManager()).smoothScrollToPosition(binding.recyclerView, null, 0);
+                appSetViewModel.setScrollUpFalse();
+            }
+        });
+
     }
 
     @Override
@@ -80,4 +85,5 @@ public class FirstFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
 }

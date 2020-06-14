@@ -5,17 +5,20 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
 
 public class AppSetViewModel extends AndroidViewModel {
     private AppSetRepository repository;
     private LiveData<List<AppSet>> allAppSets;
+    private MutableLiveData<Boolean> scrollUp;
 
     public AppSetViewModel(@NonNull Application application) {
         super(application);
         repository = new AppSetRepository(application);
         allAppSets = repository.getAllAppSets();
+        scrollUp = new MutableLiveData<>(Boolean.FALSE);
     }
 
     public void insert(AppSet appSet) {
@@ -38,7 +41,14 @@ public class AppSetViewModel extends AndroidViewModel {
         return allAppSets;
     }
 
-    public void insertNewAppSet() {
-
+    public MutableLiveData<Boolean> getScrollBool() {
+        return scrollUp;
     }
+    public void setScrollUpTrue() {
+        scrollUp.setValue(Boolean.TRUE);
+    }
+    public void setScrollUpFalse() {
+        scrollUp.setValue(Boolean.FALSE);
+    }
+
 }
