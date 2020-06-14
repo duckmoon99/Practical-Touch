@@ -7,7 +7,9 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +36,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+
 public class SecondFragment extends Fragment {
+    final String tag = "secondFragment";
 
     private LinearLayout appTray;
     private PackageManager packageManager;
@@ -61,7 +66,6 @@ public class SecondFragment extends Fragment {
                     ((MainActivity) Objects.requireNonNull(getActivity())).start_stop(listOfAppIds);
                     listOfAppIds.clear();
                     appTray.removeAllViews();
-                    Toast.makeText(getActivity(), "App launched!", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getActivity(), "Please select at least an application.", Toast.LENGTH_SHORT).show();
                 }
@@ -77,16 +81,22 @@ public class SecondFragment extends Fragment {
         final HorizontalScrollView scroll = getView().findViewById(R.id.scroll);
 
         final List<ResolveInfo> installedAppsList = getLaunchableApps();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            installedAppsList.sort((a,b) -> a.loadLabel(packageManager).toString().compareTo(b.loadLabel(packageManager).toString()));
+        }
+
         appDrawer.setAdapter(new AppAdapter(getActivity(), installedAppsList, packageManager));
 
         Point screenSize = new Point();
         appDrawer.getDisplay().getSize(screenSize);
-        appDrawer.setNumColumns(screenSize.x/162);
+        Log.i(tag, String.valueOf(appDrawer.getColumnWidth()));
 
         appDrawer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final String appId = installedAppsList.get(position).activityInfo.packageName;
+                Log.i(tag, installedAppsList.get(position).loadLabel(packageManager).toString()+" selected");
 
                 if(!listOfAppIds.contains(appId)) {
                     Drawable icon = null;

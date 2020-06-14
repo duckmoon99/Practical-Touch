@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.practicaltouch.R;
 
@@ -37,29 +38,39 @@ public class AppAdapter extends BaseAdapter {
             }
         }
      */
+
+    @Override
     public int getCount() {
         return resolveList.size();
     }
 
+    @Override
     public ResolveInfo getItem(int position) {
         return resolveList.get(position);
     }
 
+    @Override
     public long getItemId(int position) {
         return 0;
     }
 
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final ImageView viewHolder;
+        final TextView textHolder;
         LayoutInflater inflater = context.getLayoutInflater();
 
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.appicon, parent,false);
+            convertView = inflater.inflate(R.layout.menu_item, parent, false);
+            //convertView = inflater.inflate(R.layout.appicon, parent, false);
 
-            viewHolder = convertView.findViewById(R.id.appIconHolder);
-            convertView.setTag(viewHolder);
+            viewHolder = convertView.findViewById(R.id.appIcon);
+            textHolder = convertView.findViewById(R.id.appName);
+            convertView.setTag(R.id.appIcon,viewHolder);
+            convertView.setTag(R.id.appName,textHolder);
         } else {
-            viewHolder = (ImageView) convertView.getTag();
+            viewHolder = (ImageView) convertView.getTag(R.id.appIcon);
+            textHolder = (TextView) convertView.getTag(R.id.appName);
         }
 
         ResolveInfo resolveInfo = getItem(position);
@@ -67,9 +78,8 @@ public class AppAdapter extends BaseAdapter {
         Drawable appIcon = packageManager
                 .getApplicationIcon(resolveInfo.activityInfo.applicationInfo);
 
-
         viewHolder.setImageDrawable(appIcon);
-        viewHolder.setPadding(16,8,16,8);
+        textHolder.setText(resolveInfo.loadLabel(packageManager));
 
         return convertView;
     }

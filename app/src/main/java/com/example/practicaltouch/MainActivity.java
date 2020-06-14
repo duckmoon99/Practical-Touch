@@ -52,9 +52,14 @@ public class MainActivity extends AppCompatActivity {
             if (FloatingWindow.hasStarted()) {
                 stopService(new Intent(MainActivity.this, FloatingWindow.class));
             }
-            startService(
-                    new Intent(MainActivity.this, FloatingWindow.class)
-                            .putStringArrayListExtra("com.example.practicaltouch.addedApp", s));
+            Toast.makeText(this, "Application Set launched!", Toast.LENGTH_SHORT).show();
+            Intent startIntent = new Intent(MainActivity.this, FloatingWindow.class).putStringArrayListExtra("com.example.practicaltouch.addedApp", s);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(
+                        startIntent);
+            } else {
+                startService(startIntent);
+            }
 
         } else {
             reqPermission();
