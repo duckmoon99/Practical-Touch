@@ -1,14 +1,13 @@
 package com.example.practicaltouch.ui.main;
 
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,9 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-
 public class SecondFragment extends Fragment {
+    private static final String TAG = "SecondFragment";
 
     private FragmentCreatenewTabBinding binding;
     private AppSetViewModel appSetViewModel;
@@ -69,16 +67,15 @@ public class SecondFragment extends Fragment {
             installedAppsList.sort((a,b) -> a.loadLabel(packageManager).toString().compareTo(b.loadLabel(packageManager).toString()));
         }
 
-        Point screenSize = new Point();
-        binding.appDrawer.getDisplay().getSize(screenSize);
+        //Point screenSize = new Point();
+        //binding.appDrawer.getDisplay().getSize(screenSize);
+        Log.i(TAG, String.valueOf(binding.appDrawer.getColumnWidth()));
 
-        appDrawer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final String appId = installedAppsList.get(position).activityInfo.packageName;
-                Log.i(tag, installedAppsList.get(position).loadLabel(packageManager).toString()+" selected");
+        binding.appDrawer.setOnItemClickListener((parent, view12, position, id) -> {
+            final String appId = installedAppsList.get(position).activityInfo.packageName;
+            Log.i(TAG, installedAppsList.get(position).loadLabel(packageManager).toString() + " selected");
 
-            if(!listOfAppIds.contains(appId)) {
+            if (!listOfAppIds.contains(appId)) {
                 Drawable icon = null;
                 try {
                     icon = packageManager.getApplicationIcon(appId);
