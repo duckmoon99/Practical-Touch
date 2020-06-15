@@ -2,7 +2,6 @@ package com.example.practicaltouch.ui.main;
 
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +22,6 @@ import com.example.practicaltouch.R;
 import com.example.practicaltouch.database.AppSet;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolder> {
 
@@ -81,12 +79,9 @@ public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolde
             holder.appTray.addView(view2);
         }
 
-        holder.launchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.start_stop(listOfAppIds);
-                Toast.makeText(activity, "App launched!", Toast.LENGTH_SHORT).show();
-            }
+        holder.launchButton.setOnClickListener(v -> {
+            activity.start_stop(listOfAppIds);
+            Toast.makeText(activity, "App launched!", Toast.LENGTH_SHORT).show();
         });
     }
 
