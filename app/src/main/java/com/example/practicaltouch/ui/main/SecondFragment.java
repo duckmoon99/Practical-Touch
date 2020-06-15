@@ -1,9 +1,6 @@
 package com.example.practicaltouch.ui.main;
 
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +19,6 @@ import com.example.practicaltouch.database.AppSetViewModel;
 import com.example.practicaltouch.databinding.FragmentCreatenewTabBinding;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class SecondFragment extends Fragment {
@@ -45,12 +41,9 @@ public class SecondFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         packageManager = Objects.requireNonNull(getActivity()).getPackageManager();
-        final List<ResolveInfo> installedAppsList = getLaunchableApps();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            installedAppsList.sort((a,b) -> a.loadLabel(packageManager).toString().compareTo(b.loadLabel(packageManager).toString()));
-        }
 
-        AppAdapter appAdapter = new AppAdapter(getActivity(), installedAppsList, packageManager, binding);
+        AppAdapter appAdapter = new AppAdapter(getActivity(),
+                appSetViewModel.getListOfInstalledApps(), packageManager, binding);
         binding.appDrawer.setAdapter(appAdapter);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 4);
@@ -86,10 +79,6 @@ public class SecondFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-    }
-
-    private List<ResolveInfo> getLaunchableApps() {
-        return packageManager.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0);
     }
 
     private void saveAppSet(ArrayList<String> listOfAppIds) {

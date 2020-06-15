@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout>
+    <data>
+        <variable
+            name="appDrawerItem"
+            type="com.example.practicaltouch.ui.main.AppDrawerItem" />
+    </data>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="60dp"
@@ -17,6 +25,7 @@
         app:layout_constraintHorizontal_bias="0.555"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:src="@{appDrawerItem.appIcon}"
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
@@ -29,8 +38,9 @@
         android:ellipsize="end"
         android:gravity="center"
         android:maxLines="1"
-        android:text="testing super long text"
+        android:text="@{appDrawerItem.appName}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appIcon" />
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

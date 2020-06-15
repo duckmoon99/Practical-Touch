@@ -5,15 +5,14 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.practicaltouch.R;
+import com.example.practicaltouch.databinding.AppDrawerItemBinding;
 import com.example.practicaltouch.databinding.FragmentCreatenewTabBinding;
 
 import java.util.ArrayList;
@@ -25,23 +24,22 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
     private LayoutInflater layoutInflater;
     private PackageManager packageManager;
     private ArrayList<String> listOfAppIds = new ArrayList<>();
-    private FragmentCreatenewTabBinding binding;
+    private FragmentCreatenewTabBinding fragmentBinding;
 
-    AppAdapter(Activity context, List<ResolveInfo> resolveList, PackageManager packageManager, FragmentCreatenewTabBinding binding) {
+    AppAdapter(Activity context, List<ResolveInfo> resolveList, PackageManager packageManager, FragmentCreatenewTabBinding fragmentBinding) {
         this.resolveList = resolveList;
         this.packageManager = packageManager;
         this.layoutInflater = context.getLayoutInflater();
-        this.binding = binding;
+        this.fragmentBinding = fragmentBinding;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView appIcon;
-        TextView appName;
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            appIcon = itemView.findViewById(R.id.appIcon);
-            appName = itemView.findViewById(R.id.appName);
+        private AppDrawerItemBinding binding;
+
+        public ViewHolder(@NonNull AppDrawerItemBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
             itemView.setOnClickListener(v -> {
                 String appId = resolveList.get(getAdapterPosition()).activityInfo.packageName;
                 if (listOfAppIds.contains(appId)) return;
@@ -53,31 +51,41 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
                     e.printStackTrace();
                 }
 
-                final ImageView view2 = (ImageView) layoutInflater.inflate(R.layout.appicon, binding.appTray, false);
+                final ImageView view2 = (ImageView) layoutInflater.inflate(R.layout.appicon, fragmentBinding.appTray, false);
                 view2.setImageDrawable(icon);
                 view2.setPadding(16, 8, 16, 8);
                 view2.setOnClickListener(v2 -> {
-                    binding.appTray.removeView(view2);
+                    fragmentBinding.appTray.removeView(view2);
                     listOfAppIds.remove(appId);
                 });
-                binding.appTray.addView(view2);
+                fragmentBinding.appTray.addView(view2);
                 listOfAppIds.add(appId);
             });
+        }
+        public void bind(AppDrawerItem appDrawerItem) {
+            binding.setAppDrawerItem(appDrawerItem);
+            binding.executePendingBindings();
         }
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = layoutInflater.inflate(R.layout.app_drawer_item, parent, false);
-        return new ViewHolder(view);
+        AppDrawerItemBinding binding = AppDrawerItemBinding.inflate(layoutInflater, parent, false);
+        //View view = layoutInflater.inflate(R.layout.app_drawer_item, parent, false);
+        return new ViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ResolveInfo resolveInfo = resolveList.get(position);
-        holder.appName.setText(resolveInfo.loadLabel(packageManager));
-        holder.appIcon.setImageDrawable(packageManager.getApplicationIcon(resolveInfo.activityInfo.applicationInfo));
+        AppDrawerItem appDrawerItem = new AppDrawerItem
+                (packageManager.getApplicationIcon(resolveInfo.activityInfo.applicationInfo),
+                        (String) resolveInfo.loadLabel(packageManager));
+        holder.bind(appDrawerItem);
+        //ResolveInfo resolveInfo = resolveList.get(position);
+        //holder.binding.appName.setText(resolveInfo.loadLabel(packageManager));
+        //holder.binding.appIcon.setImageDrawable(packageManager.getApplicationIcon(resolveInfo.activityInfo.applicationInfo));
     }
 
     @Override
