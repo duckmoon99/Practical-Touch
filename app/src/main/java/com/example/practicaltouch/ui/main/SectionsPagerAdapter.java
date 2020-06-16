@@ -6,10 +6,6 @@ import androidx.fragment.app.FragmentActivity;
 
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-/**
- * A [FragmentPagerAdapter] that returns a fragment corresponding to
- * one of the sections/tabs/pages.
- */
 public class SectionsPagerAdapter extends FragmentStateAdapter {
 
     public SectionsPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
@@ -30,7 +26,6 @@ public class SectionsPagerAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        // Show 2 total pages.
         return 2;
     }
 

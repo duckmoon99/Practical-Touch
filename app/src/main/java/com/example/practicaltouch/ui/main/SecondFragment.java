@@ -1,7 +1,9 @@
 package com.example.practicaltouch.ui.main;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +27,6 @@ public class SecondFragment extends Fragment {
 
     private FragmentCreatenewTabBinding binding;
     private AppSetViewModel appSetViewModel;
-
     private PackageManager packageManager;
 
     @Nullable
@@ -47,23 +48,21 @@ public class SecondFragment extends Fragment {
         binding.appDrawer.setAdapter(appAdapter);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 4);
+        //binding.appDrawer.setLayoutManager(new GridLayoutManager(getActivity(),calculateNoOfColumns(getActivity())));
         binding.appDrawer.setLayoutManager(gridLayoutManager);
-
-        //Point screenSize = new Point();
-        //binding.appDrawer.getDisplay().getSize(screenSize);
-        //Log.i(TAG, String.valueOf(binding.appDrawer.getColumnWidth()));
+        binding.appDrawer.setHasFixedSize(true);
 
         binding.launchButton.setOnClickListener(view1 -> {
             ArrayList<String> listOfAppIds = appAdapter.getListOfAppIds();
-            if (!listOfAppIds.isEmpty()) {
+            if (listOfAppIds.isEmpty()) {
+                Toast.makeText(getActivity(), "Please select at least an application.", Toast.LENGTH_SHORT).show();
+            } else {
                 saveAppSet(listOfAppIds);
                 ((MainActivity) Objects.requireNonNull(getActivity())).start_stop(listOfAppIds);
                 listOfAppIds.clear();
                 binding.appTray.removeAllViews();
                 Toast.makeText(getActivity(), "App launched!", Toast.LENGTH_SHORT).show();
                 appSetViewModel.setScrollUpTrue();
-            } else {
-                Toast.makeText(getActivity(), "Please select at least an application.", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -86,6 +85,12 @@ public class SecondFragment extends Fragment {
         AppIdsList appIdsList = new AppIdsList(listOfAppIds);
         AppSet appSet = new AppSet(defaultText, appIdsList);
         appSetViewModel.insert(appSet);
+    }
+
+    public int calculateNoOfColumns(Context context) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        return (int) (dpWidth / 180);
     }
 }
 
