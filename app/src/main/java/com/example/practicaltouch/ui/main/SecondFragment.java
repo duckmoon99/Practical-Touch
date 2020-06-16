@@ -1,44 +1,33 @@
 package com.example.practicaltouch.ui.main;
 
-import android.content.Intent;
+import android.content.Context;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.graphics.Point;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.HorizontalScrollView;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.example.practicaltouch.MainActivity;
-import com.example.practicaltouch.R;
 import com.example.practicaltouch.database.AppIdsList;
 import com.example.practicaltouch.database.AppSet;
 import com.example.practicaltouch.database.AppSetViewModel;
 import com.example.practicaltouch.databinding.FragmentCreatenewTabBinding;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class SecondFragment extends Fragment {
-    private static final String TAG = "SecondFragment";
 
     private FragmentCreatenewTabBinding binding;
     private AppSetViewModel appSetViewModel;
-
     private PackageManager packageManager;
-    private ArrayList<String> listOfAppIds = new ArrayList<>();
 
     @Nullable
     @Override
@@ -52,66 +41,35 @@ public class SecondFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-//        Log.d(TAG, "onViewCreated: BEFORE VIEWMODEL created");
-//        appSetViewModel = ViewModelProvider.AndroidViewModelFactory
-//                .getInstance(Objects.requireNonNull(this.getActivity()).getApplication()).create(AppSetViewModel.class);
-//        Log.d(TAG, "onViewCreated: AFTER VIEWMODEL created");
-
         packageManager = Objects.requireNonNull(getActivity()).getPackageManager();
-        final HorizontalScrollView scroll = binding.scrollbar;
 
-        final List<ResolveInfo> installedAppsList = getLaunchableApps();
-        binding.appDrawer.setAdapter(new AppAdapter(getActivity(), installedAppsList, packageManager));
+        AppAdapter appAdapter = new AppAdapter(getActivity(),
+                appSetViewModel.getListOfInstalledApps(), packageManager, binding);
+        binding.appDrawer.setAdapter(appAdapter);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            installedAppsList.sort((a,b) -> a.loadLabel(packageManager).toString().compareTo(b.loadLabel(packageManager).toString()));
-        }
-
-        //Point screenSize = new Point();
-        //binding.appDrawer.getDisplay().getSize(screenSize);
-        Log.i(TAG, String.valueOf(binding.appDrawer.getColumnWidth()));
-
-        binding.appDrawer.setOnItemClickListener((parent, view12, position, id) -> {
-            final String appId = installedAppsList.get(position).activityInfo.packageName;
-            Log.i(TAG, installedAppsList.get(position).loadLabel(packageManager).toString() + " selected");
-
-            if (!listOfAppIds.contains(appId)) {
-                Drawable icon = null;
-                try {
-                    icon = packageManager.getApplicationIcon(appId);
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
-                }
-                LayoutInflater inflater = getLayoutInflater();
-                final ImageView view2 = (ImageView) inflater.inflate(R.layout.appicon, parent, false);
-                view2.setImageDrawable(icon);
-                view2.setPadding(16, 8, 16, 8);
-                binding.appTray.addView(view2);
-                view2.setOnClickListener(v -> {
-                    binding.appTray.removeView(view2);
-                    listOfAppIds.remove(appId);
-                });
-                listOfAppIds.add(appId);
-            }
-        });
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 4);
+        //binding.appDrawer.setLayoutManager(new GridLayoutManager(getActivity(),calculateNoOfColumns(getActivity())));
+        binding.appDrawer.setLayoutManager(gridLayoutManager);
+        binding.appDrawer.setHasFixedSize(true);
 
         binding.launchButton.setOnClickListener(view1 -> {
-            if (!listOfAppIds.isEmpty()) {
-                saveAppSet();
+            ArrayList<String> listOfAppIds = appAdapter.getListOfAppIds();
+            if (listOfAppIds.isEmpty()) {
+                Toast.makeText(getActivity(), "Please select at least an application.", Toast.LENGTH_SHORT).show();
+            } else {
+                saveAppSet(listOfAppIds);
                 ((MainActivity) Objects.requireNonNull(getActivity())).start_stop(listOfAppIds);
                 listOfAppIds.clear();
                 binding.appTray.removeAllViews();
                 Toast.makeText(getActivity(), "App launched!", Toast.LENGTH_SHORT).show();
                 appSetViewModel.setScrollUpTrue();
-            } else {
-                Toast.makeText(getActivity(), "Please select at least an application.", Toast.LENGTH_SHORT).show();
             }
         });
 
         binding.appTray.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
             int newRight = right - oldRight;
             if (newRight > 0) {
-                scroll.fullScroll(View.FOCUS_RIGHT);
+                binding.scrollbar.fullScroll(View.FOCUS_RIGHT);
             }
         });
     }
@@ -122,37 +80,17 @@ public class SecondFragment extends Fragment {
         binding = null;
     }
 
-    private List<ResolveInfo> getLaunchableApps() {
-        return packageManager.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0);
-    }
-
-    /*
-    private boolean isSystemPackage(PackageInfo pkgInfo) {
-        return ((pkgInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
-    }
-
-    private List<PackageInfo> getInstalledApps() {
-        List<PackageInfo> packageList = packageManager
-                .getInstalledPackages(PackageManager.GET_PERMISSIONS);
-
-        final List<PackageInfo> packageList1 = new ArrayList<>();
-
-        //To filter out System apps
-        for (PackageInfo pi : packageList) {
-            if(!isSystemPackage(pi)){
-                packageList1.add(pi);
-            }
-        }
-
-        return packageList1;
-    }
-    */
-
-    private void saveAppSet() {
+    private void saveAppSet(ArrayList<String> listOfAppIds) {
         String defaultText = "My Apps";
         AppIdsList appIdsList = new AppIdsList(listOfAppIds);
         AppSet appSet = new AppSet(defaultText, appIdsList);
         appSetViewModel.insert(appSet);
+    }
+
+    public int calculateNoOfColumns(Context context) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        return (int) (dpWidth / 180);
     }
 }
 

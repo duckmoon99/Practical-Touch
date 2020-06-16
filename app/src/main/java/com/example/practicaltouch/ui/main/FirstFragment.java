@@ -10,17 +10,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.practicaltouch.MainActivity;
-import com.example.practicaltouch.database.AppSet;
 import com.example.practicaltouch.database.AppSetViewModel;
 import com.example.practicaltouch.databinding.FragmentCreatedsetsTabBinding;
 
-import java.util.List;
 import java.util.Objects;
 
 public class FirstFragment extends Fragment {
@@ -51,10 +48,6 @@ public class FirstFragment extends Fragment {
                 new AppSetAdapter(packageManager, layoutInflater, getActivity());
         recyclerView.setAdapter(appSetAdapter);
 
-//        Log.d(TAG, "onViewCreated: BEFORE VIEWMODEL created");
-//        appSetViewModel = ViewModelProvider.AndroidViewModelFactory
-//                .getInstance(this.getActivity().getApplication()).create(AppSetViewModel.class);
-//        Log.d(TAG, "onViewCreated: AFTER VIEWMODEL created");
         appSetViewModel.getAllAppSets().observe(getViewLifecycleOwner(), appSetAdapter::submitList);
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
