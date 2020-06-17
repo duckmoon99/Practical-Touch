@@ -7,6 +7,8 @@
     <string name="delete_all_appsets">Delete all AppSets</string>
     <string name="appdraweritem_appicon">An AppIcon in an AppDrawer</string>
     <string name="appdraweritem_appname">An AppName in an AppDrawer</string>
+    <string name="my_apps">My Apps</string>
+    <string name="appset_title">An AppSet Title</string>
 </resources>
 
 

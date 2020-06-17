@@ -14,11 +14,14 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.List;
 
 public class AppSetViewModel extends AndroidViewModel {
+
     private AppSetRepository repository;
     private LiveData<List<AppSet>> allAppSets;
     private MutableLiveData<Boolean> scrollUp;
+
     private PackageManager packageManager;
     private List<ResolveInfo> listOfInstalledApps;
+    //private LiveData<List<String>> appTrayList;
 
     public AppSetViewModel(@NonNull Application application) {
         super(application);
@@ -58,6 +61,7 @@ public class AppSetViewModel extends AndroidViewModel {
     public void setScrollUpFalse() {
         scrollUp.setValue(Boolean.FALSE);
     }
+
     public List<ResolveInfo> getListOfInstalledApps() {
         return listOfInstalledApps;
     }

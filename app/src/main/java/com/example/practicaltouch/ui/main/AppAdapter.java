@@ -53,7 +53,6 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
 
                 final ImageView view2 = (ImageView) layoutInflater.inflate(R.layout.appicon, fragmentBinding.appTray, false);
                 view2.setImageDrawable(icon);
-                view2.setPadding(16, 8, 16, 8);
                 view2.setOnClickListener(v2 -> {
                     fragmentBinding.appTray.removeView(view2);
                     listOfAppIds.remove(appId);

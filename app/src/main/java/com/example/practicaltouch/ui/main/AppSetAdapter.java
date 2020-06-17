@@ -75,14 +75,10 @@ public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolde
             }
             final ImageView view2 = (ImageView) layoutInflater.inflate(R.layout.appicon, holder.appTray, false);
             view2.setImageDrawable(icon);
-            view2.setPadding(16,8,16,8);
             holder.appTray.addView(view2);
         }
 
-        holder.launchButton.setOnClickListener(v -> {
-            activity.start_stop(listOfAppIds);
-            Toast.makeText(activity, "App launched!", Toast.LENGTH_SHORT).show();
-        });
+        holder.launchButton.setOnClickListener(v -> activity.start_stop(listOfAppIds));
     }
 
     AppSet getAppSetAt(int position) {
