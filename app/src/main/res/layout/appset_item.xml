@@ -1,43 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginEnd="8dp"
     android:layout_marginStart="8dp"
     android:layout_marginTop="8dp">
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp">
-
-        <Button
-            android:id="@+id/appset_launchbutton"
-            android:text="@string/launch_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            />
 
         <TextView
             android:id="@+id/appset_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-            android:layout_toStartOf="@id/appset_launchbutton"
-            android:layout_alignParentStart="true"
-
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:maxLines="1"
+            android:layout_alignParentTop="true"
             android:ellipsize="end"
-            />
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
         <HorizontalScrollView
+            android:id="@+id/scrollappset"
             android:layout_width="match_parent"
             android:layout_height="64dp"
             android:layout_below="@id/appset_name"
-            android:layout_toStartOf="@+id/appset_launchbutton">
+            android:layout_toStartOf="@id/appset_launchbutton">
 
             <LinearLayout
                 android:id="@+id/appset_linearlayout"
@@ -46,6 +35,23 @@
                 android:orientation="horizontal" />
         </HorizontalScrollView>
 
-    </RelativeLayout>
+        <Button
+            android:id="@+id/appset_launchbutton"
+            android:text="@string/launch_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/dropdown_menu_button"
+            />
 
+        <ImageView
+            android:id="@+id/dropdown_menu_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="4dp"
+            app:srcCompat="@drawable/ic_baseline_more_vert_24"
+            android:contentDescription="@string/overflow_menu"/>
+    </RelativeLayout>
 </androidx.cardview.widget.CardView>

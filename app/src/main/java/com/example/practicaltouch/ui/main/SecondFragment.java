@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.example.practicaltouch.MainActivity;
+import com.example.practicaltouch.R;
 import com.example.practicaltouch.database.AppIdsList;
 import com.example.practicaltouch.database.AppSet;
 import com.example.practicaltouch.database.AppSetViewModel;
@@ -55,13 +56,16 @@ public class SecondFragment extends Fragment {
         binding.launchButton.setOnClickListener(view1 -> {
             ArrayList<String> listOfAppIds = appAdapter.getListOfAppIds();
             if (listOfAppIds.isEmpty()) {
-                Toast.makeText(getActivity(), "Please select at least an application.", Toast.LENGTH_SHORT).show();
-            } else {
+                Toast.makeText(getActivity(), "Please select at least an application", Toast.LENGTH_SHORT).show();
+            }
+            else if (binding.inputName.getText().toString().equals("")) {
+                Toast.makeText(getActivity(), "Please input a title", Toast.LENGTH_SHORT).show();
+            }
+            else {
                 saveAppSet(listOfAppIds);
                 ((MainActivity) Objects.requireNonNull(getActivity())).start_stop(listOfAppIds);
                 listOfAppIds.clear();
                 binding.appTray.removeAllViews();
-                Toast.makeText(getActivity(), "App launched!", Toast.LENGTH_SHORT).show();
                 appSetViewModel.setScrollUpTrue();
             }
         });
@@ -81,10 +85,11 @@ public class SecondFragment extends Fragment {
     }
 
     private void saveAppSet(ArrayList<String> listOfAppIds) {
-        String defaultText = "My Apps";
+        String appSetName = binding.inputName.getText().toString();
         AppIdsList appIdsList = new AppIdsList(listOfAppIds);
-        AppSet appSet = new AppSet(defaultText, appIdsList);
+        AppSet appSet = new AppSet(appSetName, appIdsList);
         appSetViewModel.insert(appSet);
+        binding.inputName.setText(R.string.my_apps);
     }
 
     public int calculateNoOfColumns(Context context) {
