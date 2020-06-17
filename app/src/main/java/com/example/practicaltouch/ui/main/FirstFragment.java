@@ -5,12 +5,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -50,8 +48,15 @@ public class FirstFragment extends Fragment {
 
         appSetViewModel.getAllAppSets().observe(getViewLifecycleOwner(), appSetAdapter::submitList);
 
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
-                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+        appSetViewModel.getScrollBool().observe(getViewLifecycleOwner(), aBoolean -> {
+            if (aBoolean) {
+                Objects.requireNonNull(binding.recyclerView.getLayoutManager()).smoothScrollToPosition(binding.recyclerView, null, 0);
+                appSetViewModel.setScrollUpFalse();
+            }
+        });
+
+        /*
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, 0) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false;
@@ -59,17 +64,10 @@ public class FirstFragment extends Fragment {
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                appSetViewModel.delete(appSetAdapter.getAppSetAt(viewHolder.getAdapterPosition()));
-                Toast.makeText(getActivity(), "AppSet deleted", Toast.LENGTH_SHORT).show();
+
             }
         }).attachToRecyclerView(recyclerView);
-
-        appSetViewModel.getScrollBool().observe(getViewLifecycleOwner(), aBoolean -> {
-            if (aBoolean) {
-                Objects.requireNonNull(binding.recyclerView.getLayoutManager()).smoothScrollToPosition(binding.recyclerView, null, 0);
-                appSetViewModel.setScrollUpFalse();
-            }
-        });
+         */
 
     }
 

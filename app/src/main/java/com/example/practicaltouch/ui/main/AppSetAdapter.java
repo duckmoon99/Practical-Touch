@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -78,6 +79,25 @@ public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolde
             holder.appTray.addView(view2);
         }
 
+        holder.dropDownMenu.setOnClickListener(v -> {
+            PopupMenu popupMenu = new PopupMenu(activity, holder.dropDownMenu);
+            popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.edit_menu_item:
+                        Toast.makeText(activity, "Edit!", Toast.LENGTH_SHORT).show();
+                        return true;
+                    case R.id.delete_menu_item:
+                        activity.getAppSetViewModel().delete(currentAppSet);
+                        Toast.makeText(activity, "Appset deleted", Toast.LENGTH_SHORT).show();
+                        return true;
+                    default:
+                        return false;
+                }
+            });
+            popupMenu.show();
+        });
+
         holder.launchButton.setOnClickListener(v -> activity.start_stop(listOfAppIds));
     }
 
@@ -89,13 +109,14 @@ public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolde
         private TextView appTrayName;
         private LinearLayout appTray;
         private Button launchButton;
+        private ImageView dropDownMenu;
 
         AppSetHolder(@NonNull View itemView) {
             super(itemView);
             appTrayName = itemView.findViewById(R.id.appset_name);
             appTray = itemView.findViewById(R.id.appset_linearlayout);
             launchButton = itemView.findViewById(R.id.appset_launchbutton);
-
+            dropDownMenu = itemView.findViewById(R.id.dropdown_menu_button);
         }
     }
 
