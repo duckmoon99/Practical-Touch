@@ -8,10 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class AppTray extends LinearLayout {
-    public AppTray(final Context context, ArrayList<String> appList, final PackageManager packageManager) {
+    public AppTray(final Context context, List<String> appList, final PackageManager packageManager) {
         super(context);
         for (final String s: appList) {
             ImageView current = new ImageView(context);
