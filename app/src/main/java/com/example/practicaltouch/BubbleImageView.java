@@ -13,7 +13,7 @@ public class BubbleImageView extends ImageView {
     public BubbleImageView(Context context) {
         super(context);
         open = false;
-        setImageResource(R.mipmap.logo_foreground);
+        setImageResource(R.drawable.logo);
         setLayoutParams(new ViewGroup.LayoutParams(180, 180));
         setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -25,9 +25,9 @@ public class BubbleImageView extends ImageView {
 
     public void toggle() {
         if (open) {
-            setImageResource(R.mipmap.logo_foreground);
+            setImageResource(R.drawable.logo);
         } else {
-            setImageResource(R.mipmap.collapse_foreground);
+            setImageResource(R.drawable.collapse);
         }
         open = !open;
     }

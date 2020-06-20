@@ -45,6 +45,7 @@ public class FloatingWindow extends Service {
     BubbleImageView openapp;
     ImageView crossIcon;
     WindowManager.LayoutParams params;
+    WindowManager.LayoutParams updatepar;
     private PackageManager packageManager;
 
 
@@ -82,7 +83,6 @@ public class FloatingWindow extends Service {
         windowManager.addView(frontLayer, params);
 
         openapp.setOnTouchListener(new View.OnTouchListener() {
-            WindowManager.LayoutParams updatepar = params;
             double x;
             double y;
             double px;
@@ -178,6 +178,7 @@ public class FloatingWindow extends Service {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
         params.gravity = Gravity.END | Gravity.TOP;
+        updatepar = params;
 
         backLayer = new LinearLayout(this);
         backLayer.setBackgroundColor(Color.TRANSPARENT);
