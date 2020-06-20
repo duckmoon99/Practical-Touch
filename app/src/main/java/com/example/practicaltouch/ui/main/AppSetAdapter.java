@@ -1,5 +1,6 @@
 package com.example.practicaltouch.ui.main;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.practicaltouch.MainActivity;
 import com.example.practicaltouch.R;
 import com.example.practicaltouch.database.AppSet;
+import com.example.practicaltouch.database.AppSetViewModel;
 
 import java.util.ArrayList;
 
@@ -61,9 +64,10 @@ public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolde
     @Override
     public void onBindViewHolder(@NonNull AppSetHolder holder, int position) {
         AppSet currentAppSet = getItem(position);
+        String appSetName = currentAppSet.getName();
 
         holder.appTray.removeAllViews();
-        holder.appTrayName.setText(currentAppSet.getName());
+        holder.appTrayName.setText(appSetName);
 
         final ArrayList<String> listOfAppIds = new ArrayList<>(currentAppSet.getAppIdsList().getListOfAppIds());
         int count = listOfAppIds.size();
@@ -85,10 +89,14 @@ public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolde
             popupMenu.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
                     case R.id.edit_menu_item:
-                        Toast.makeText(activity, "Edit!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(activity, EditAppSet.class);
+                        intent.putExtra(EditAppSet.EXTRA_ID, currentAppSet.getId());
+                        intent.putExtra(EditAppSet.EXTRA_NAME, appSetName);
+                        intent.putStringArrayListExtra(EditAppSet.EXTRA_APPSETS, listOfAppIds);
+                        activity.startActivityForResult(intent, MainActivity.EDIT_APPSET_REQUEST);
                         return true;
                     case R.id.delete_menu_item:
-                        activity.getAppSetViewModel().delete(currentAppSet);
+                        new ViewModelProvider(activity).get(AppSetViewModel.class).delete(currentAppSet);
                         Toast.makeText(activity, "Appset deleted", Toast.LENGTH_SHORT).show();
                         return true;
                     default:

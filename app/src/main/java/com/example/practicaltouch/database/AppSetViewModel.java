@@ -1,10 +1,7 @@
 package com.example.practicaltouch.database;
 
 import android.app.Application;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -14,22 +11,20 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.List;
 
 public class AppSetViewModel extends AndroidViewModel {
-
+    private static final String TAG = "AppSetViewModel";
+    
     private AppSetRepository repository;
     private LiveData<List<AppSet>> allAppSets;
     private MutableLiveData<Boolean> scrollUp;
 
-    private PackageManager packageManager;
-    private List<ResolveInfo> listOfInstalledApps;
     //private LiveData<List<String>> appTrayList;
 
     public AppSetViewModel(@NonNull Application application) {
         super(application);
+        Log.d(TAG, "AppSetViewModel: hi");
         this.repository = new AppSetRepository(application);
         this.allAppSets = repository.getAllAppSets();
         this.scrollUp = new MutableLiveData<>(Boolean.FALSE);
-        this.packageManager = application.getPackageManager();
-        setUpResolveInfo();
     }
 
     public void insert(AppSet appSet) {
@@ -62,20 +57,5 @@ public class AppSetViewModel extends AndroidViewModel {
         scrollUp.setValue(Boolean.FALSE);
     }
 
-    public List<ResolveInfo> getListOfInstalledApps() {
-        return listOfInstalledApps;
-    }
-
-    private void setUpResolveInfo() {
-        final List<ResolveInfo> installedAppsList = getLaunchableApps();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            installedAppsList.sort((a,b) -> a.loadLabel(packageManager).toString().compareTo(b.loadLabel(packageManager).toString()));
-        }
-        this.listOfInstalledApps = installedAppsList;
-    }
-
-    private List<ResolveInfo> getLaunchableApps() {
-        return packageManager.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0);
-    }
 
 }

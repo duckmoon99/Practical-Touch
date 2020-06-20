@@ -2,16 +2,20 @@ package com.example.practicaltouch.ui.main;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.example.practicaltouch.MainActivity;
@@ -19,22 +23,25 @@ import com.example.practicaltouch.R;
 import com.example.practicaltouch.database.AppIdsList;
 import com.example.practicaltouch.database.AppSet;
 import com.example.practicaltouch.database.AppSetViewModel;
+import com.example.practicaltouch.database.AppsList;
 import com.example.practicaltouch.databinding.FragmentCreatenewTabBinding;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class SecondFragment extends Fragment {
+public class SecondFragment extends Fragment implements AppAdapter.OnAppListener {
 
     private FragmentCreatenewTabBinding binding;
     private AppSetViewModel appSetViewModel;
     private PackageManager packageManager;
+    private ArrayList<String> listOfAppIds;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentCreatenewTabBinding.inflate(inflater, container, false);
-        appSetViewModel = ((MainActivity) Objects.requireNonNull(getActivity())).getAppSetViewModel();
+        appSetViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity())).get(AppSetViewModel.class);
+        listOfAppIds = new ArrayList<>();
         return binding.getRoot();
     }
 
@@ -45,7 +52,7 @@ public class SecondFragment extends Fragment {
         packageManager = Objects.requireNonNull(getActivity()).getPackageManager();
 
         AppAdapter appAdapter = new AppAdapter(getActivity(),
-                appSetViewModel.getListOfInstalledApps(), packageManager, binding);
+                AppsList.getInstance(packageManager).getListOfAppDrawerItems(), this);
         binding.appDrawer.setAdapter(appAdapter);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 4);
@@ -54,11 +61,10 @@ public class SecondFragment extends Fragment {
         binding.appDrawer.setHasFixedSize(true);
 
         binding.launchButton.setOnClickListener(view1 -> {
-            ArrayList<String> listOfAppIds = appAdapter.getListOfAppIds();
             if (listOfAppIds.isEmpty()) {
                 Toast.makeText(getActivity(), "Please select at least an application", Toast.LENGTH_SHORT).show();
             }
-            else if (binding.inputName.getText().toString().equals("")) {
+            else if (binding.inputName.getText().toString().trim().equals("")) {
                 Toast.makeText(getActivity(), "Please input a title", Toast.LENGTH_SHORT).show();
             }
             else {
@@ -96,6 +102,30 @@ public class SecondFragment extends Fragment {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         return (int) (dpWidth / 180);
+    }
+
+    @Override
+    public void onAppClick(int position) {
+        ResolveInfo resolveInfo = AppsList.getInstance(packageManager).getResolveInfoAt(position);
+        String appId = resolveInfo.activityInfo.packageName;
+
+        if (listOfAppIds.contains(appId)) return;
+
+        Drawable icon = null;
+        try {
+            icon = packageManager.getApplicationIcon(appId);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        final ImageView view2 = (ImageView) getLayoutInflater().inflate(R.layout.appicon, binding.appTray, false);
+        view2.setImageDrawable(icon);
+        view2.setOnClickListener(v2 -> {
+            binding.appTray.removeView(view2);
+            listOfAppIds.remove(appId);
+        });
+        binding.appTray.addView(view2);
+        listOfAppIds.add(appId);
     }
 }
 
