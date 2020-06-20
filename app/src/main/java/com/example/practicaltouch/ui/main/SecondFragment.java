@@ -98,11 +98,13 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
         binding.inputName.setText(R.string.my_apps);
     }
 
+    /*
     public int calculateNoOfColumns(Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         return (int) (dpWidth / 180);
     }
+     */
 
     @Override
     public void onAppClick(int position) {

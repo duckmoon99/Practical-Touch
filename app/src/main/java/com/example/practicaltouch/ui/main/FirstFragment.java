@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.practicaltouch.MainActivity;
 import com.example.practicaltouch.database.AppSetViewModel;
 import com.example.practicaltouch.databinding.FragmentCreatedsetsTabBinding;
 

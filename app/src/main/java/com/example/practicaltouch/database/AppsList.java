@@ -48,9 +48,6 @@ public class AppsList {
         return packageManager.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0);
     }
 
-    public List<ResolveInfo> getListOfInstalledApps() {
-        return listOfInstalledApps;
-    }
     public List<AppDrawerItem> getListOfAppDrawerItems() {
         return listOfAppDrawerItem;
     }

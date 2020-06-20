@@ -1,7 +1,6 @@
 package com.example.practicaltouch.database;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -11,8 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.List;
 
 public class AppSetViewModel extends AndroidViewModel {
-    private static final String TAG = "AppSetViewModel";
-    
+
     private AppSetRepository repository;
     private LiveData<List<AppSet>> allAppSets;
     private MutableLiveData<Boolean> scrollUp;
@@ -21,7 +19,6 @@ public class AppSetViewModel extends AndroidViewModel {
 
     public AppSetViewModel(@NonNull Application application) {
         super(application);
-        Log.d(TAG, "AppSetViewModel: hi");
         this.repository = new AppSetRepository(application);
         this.allAppSets = repository.getAllAppSets();
         this.scrollUp = new MutableLiveData<>(Boolean.FALSE);
