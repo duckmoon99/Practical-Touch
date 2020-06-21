@@ -40,9 +40,32 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentCreatenewTabBinding.inflate(inflater, container, false);
-        appSetViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity())).get(AppSetViewModel.class);
-        listOfAppIds = new ArrayList<>();
+        appSetViewModel = new ViewModelProvider(this).get(AppSetViewModel.class);
+        listOfAppIds = appSetViewModel.getListOfAppIds();
         return binding.getRoot();
+    }
+
+    private void loadList() {
+        for(String appId: listOfAppIds){
+            addApp(appId);
+        }
+    }
+
+    //adds an app to the tray (make sure to check if it is already in listOfAppId)
+    private void addApp(String appId){
+        Drawable icon = null;
+        try {
+            icon = packageManager.getApplicationIcon(appId);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        final ImageView view2 = (ImageView) getLayoutInflater().inflate(R.layout.appicon, binding.appTray, false);
+        view2.setImageDrawable(icon);
+        view2.setOnClickListener(v2 -> {
+            binding.appTray.removeView(view2);
+            listOfAppIds.remove(appId);
+        });
+        binding.appTray.addView(view2);
     }
 
     @Override
@@ -50,15 +73,16 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
         super.onViewCreated(view, savedInstanceState);
 
         packageManager = Objects.requireNonNull(getActivity()).getPackageManager();
+        loadList();
 
         AppAdapter appAdapter = new AppAdapter(getActivity(),
                 AppsList.getInstance(packageManager).getListOfAppDrawerItems(), this);
         binding.appDrawer.setAdapter(appAdapter);
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 4);
-        //binding.appDrawer.setLayoutManager(new GridLayoutManager(getActivity(),calculateNoOfColumns(getActivity())));
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), calculateNoOfColumns(getActivity()));
         binding.appDrawer.setLayoutManager(gridLayoutManager);
         binding.appDrawer.setHasFixedSize(true);
+
 
         binding.launchButton.setOnClickListener(view1 -> {
             if (listOfAppIds.isEmpty()) {
@@ -98,36 +122,21 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
         binding.inputName.setText(R.string.my_apps);
     }
 
-    /*
+
     public int calculateNoOfColumns(Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        return (int) (dpWidth / 180);
+        return (int) (dpWidth / 80);
     }
-     */
+
 
     @Override
     public void onAppClick(int position) {
         ResolveInfo resolveInfo = AppsList.getInstance(packageManager).getResolveInfoAt(position);
         String appId = resolveInfo.activityInfo.packageName;
-
-        if (listOfAppIds.contains(appId)) return;
-
-        Drawable icon = null;
-        try {
-            icon = packageManager.getApplicationIcon(appId);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        final ImageView view2 = (ImageView) getLayoutInflater().inflate(R.layout.appicon, binding.appTray, false);
-        view2.setImageDrawable(icon);
-        view2.setOnClickListener(v2 -> {
-            binding.appTray.removeView(view2);
-            listOfAppIds.remove(appId);
-        });
-        binding.appTray.addView(view2);
+        if(listOfAppIds.contains(appId)) return;
         listOfAppIds.add(appId);
+        addApp(appId);
     }
 }
 

@@ -14,13 +14,8 @@ public class BubbleImageView extends ImageView {
         super(context);
         open = false;
         setImageResource(R.drawable.logo);
-        setLayoutParams(new ViewGroup.LayoutParams(180, 180));
-        setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view){
-                return true;
-            }
-        });
+        setLayoutParams(new ViewGroup.LayoutParams(150, 150));
+        setOnLongClickListener(view -> true);
     }
 
     public void toggle() {
