@@ -11,13 +11,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.practicaltouch.database.AppIdsList;
+import com.example.practicaltouch.database.AppSet;
 import com.example.practicaltouch.database.AppSetViewModel;
 import com.example.practicaltouch.databinding.ActivityMainBinding;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.practicaltouch.ui.main.EditAppSet;
 import com.example.practicaltouch.ui.main.SectionsPagerAdapter;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -29,6 +33,7 @@ public class MainActivity extends AppCompatActivity{
     AppSetViewModel appSetViewModel;
     AlertDialog alert;
     private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2};
+    public static final int EDIT_APPSET_REQUEST = 1;
 
 
     @Override
@@ -44,8 +49,7 @@ public class MainActivity extends AppCompatActivity{
 
         setSupportActionBar(binding.toolbar);
 
-        appSetViewModel = ViewModelProvider.AndroidViewModelFactory
-                .getInstance(getApplication()).create(AppSetViewModel.class);
+        appSetViewModel = new ViewModelProvider(this).get(AppSetViewModel.class);
     }
 
     public void start_stop(ArrayList<String> s) {
@@ -116,7 +120,26 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    public AppSetViewModel getAppSetViewModel() {
-        return appSetViewModel;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == EDIT_APPSET_REQUEST && resultCode == RESULT_OK) {
+            assert data != null;
+            int id = data.getIntExtra(EditAppSet.EXTRA_ID, -1);
+            if (id == -1) {
+                Toast.makeText(this, "Something went wrong, AppSet can't be updated",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String name = data.getStringExtra(EditAppSet.EXTRA_NAME);
+            AppIdsList appIdsList = new AppIdsList(data.getStringArrayListExtra(EditAppSet.EXTRA_APPSETS));
+            AppSet appSet = new AppSet(name, appIdsList);
+            appSet.setId(id);
+            appSetViewModel.update(appSet);
+
+            Toast.makeText(this, "AppSet updated", Toast.LENGTH_SHORT).show();
+        }
     }
 }

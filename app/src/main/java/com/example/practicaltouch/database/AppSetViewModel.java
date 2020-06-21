@@ -1,10 +1,6 @@
 package com.example.practicaltouch.database;
 
 import android.app.Application;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -19,8 +15,6 @@ public class AppSetViewModel extends AndroidViewModel {
     private LiveData<List<AppSet>> allAppSets;
     private MutableLiveData<Boolean> scrollUp;
 
-    private PackageManager packageManager;
-    private List<ResolveInfo> listOfInstalledApps;
     //private LiveData<List<String>> appTrayList;
 
     public AppSetViewModel(@NonNull Application application) {
@@ -28,8 +22,6 @@ public class AppSetViewModel extends AndroidViewModel {
         this.repository = new AppSetRepository(application);
         this.allAppSets = repository.getAllAppSets();
         this.scrollUp = new MutableLiveData<>(Boolean.FALSE);
-        this.packageManager = application.getPackageManager();
-        setUpResolveInfo();
     }
 
     public void insert(AppSet appSet) {
@@ -62,20 +54,5 @@ public class AppSetViewModel extends AndroidViewModel {
         scrollUp.setValue(Boolean.FALSE);
     }
 
-    public List<ResolveInfo> getListOfInstalledApps() {
-        return listOfInstalledApps;
-    }
-
-    private void setUpResolveInfo() {
-        final List<ResolveInfo> installedAppsList = getLaunchableApps();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            installedAppsList.sort((a,b) -> a.loadLabel(packageManager).toString().compareTo(b.loadLabel(packageManager).toString()));
-        }
-        this.listOfInstalledApps = installedAppsList;
-    }
-
-    private List<ResolveInfo> getLaunchableApps() {
-        return packageManager.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0);
-    }
 
 }

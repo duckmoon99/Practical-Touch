@@ -11,6 +11,7 @@
     <string name="appset_title">An AppSet Title</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
+    <string name="save">Save</string>
     <string name="overflow_menu">Overflow popup menu</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="configure">Configure</string>
