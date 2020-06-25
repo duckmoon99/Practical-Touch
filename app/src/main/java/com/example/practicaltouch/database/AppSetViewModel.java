@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AppSetViewModel extends AndroidViewModel {
@@ -15,7 +16,11 @@ public class AppSetViewModel extends AndroidViewModel {
     private LiveData<List<AppSet>> allAppSets;
     private MutableLiveData<Boolean> scrollUp;
 
-    //private LiveData<List<String>> appTrayList;
+    private ArrayList<String> listOfAppIds = new ArrayList<>();
+
+    public ArrayList<String> getListOfAppIds() {
+        return listOfAppIds;
+    }
 
     public AppSetViewModel(@NonNull Application application) {
         super(application);
