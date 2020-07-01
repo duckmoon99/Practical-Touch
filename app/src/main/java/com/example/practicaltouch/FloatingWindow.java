@@ -13,7 +13,6 @@ import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,9 +26,9 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class FloatingWindow extends Service {
-    final String tag = "floatingWindow";
     private static String CHANNEL_ID = "com.example.practicaltouch.channel";
 
     private static boolean started = false;
@@ -53,7 +52,7 @@ public class FloatingWindow extends Service {
     public int onStartCommand(Intent intent, int flags, int startId){
         started = true;
 
-        NotificationChannel channel = null;
+        NotificationChannel channel;
         Intent homeIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, homeIntent, 0);
 
@@ -63,7 +62,7 @@ public class FloatingWindow extends Service {
             String description = "Shows if Practical Touch is running.";
             channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
-            getSystemService(NotificationManager.class).createNotificationChannel(channel);
+            Objects.requireNonNull(getSystemService(NotificationManager.class)).createNotificationChannel(channel);
         }
 
         Notification notification = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
@@ -124,16 +123,13 @@ public class FloatingWindow extends Service {
             }
         });
 
-        openapp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (openapp.isOpen()) {
-                    appTrayContainer.removeView(appTray);
-                } else {
-                    appTrayContainer.addView(appTray);
-                }
-                openapp.toggle();
+        openapp.setOnClickListener(view -> {
+            if (openapp.isOpen()) {
+                appTrayContainer.removeView(appTray);
+            } else {
+                appTrayContainer.addView(appTray);
             }
+            openapp.toggle();
         });
 
         appTray = new AppTray(this, appList, packageManager);
