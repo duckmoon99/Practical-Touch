@@ -40,7 +40,7 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentCreatenewTabBinding.inflate(inflater, container, false);
-        appSetViewModel = new ViewModelProvider(this).get(AppSetViewModel.class);
+        appSetViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity())).get(AppSetViewModel.class);
         listOfAppIds = appSetViewModel.getListOfAppIds();
         return binding.getRoot();
     }
