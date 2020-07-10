@@ -6,6 +6,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,10 +32,12 @@ import java.util.Objects;
 
 public class SecondFragment extends Fragment implements AppAdapter.OnAppListener {
 
+    private static String TAG = "second_fragment";
     private FragmentCreatenewTabBinding binding;
     private AppSetViewModel appSetViewModel;
     private PackageManager packageManager;
     private ArrayList<String> listOfAppIds;
+    private boolean loaded;
 
     @Nullable
     @Override
@@ -71,17 +74,22 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        if(!loaded){
+            Toast.makeText(getContext(), "Loading app menu", Toast.LENGTH_SHORT).show();
+        }
         packageManager = Objects.requireNonNull(getActivity()).getPackageManager();
         loadList();
-
-        AppAdapter appAdapter = new AppAdapter(getActivity(),
-                AppsList.getInstance(packageManager).getListOfAppDrawerItems(), this);
-        binding.appDrawer.setAdapter(appAdapter);
-
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), calculateNoOfColumns(getActivity()));
-        binding.appDrawer.setLayoutManager(gridLayoutManager);
-        binding.appDrawer.setHasFixedSize(true);
+        new Thread(() -> {
+            AppAdapter appAdapter = new AppAdapter(getActivity(),
+                    AppsList.getInstance(packageManager).getListOfAppDrawerItems(), SecondFragment.this);
+            binding.appDrawer.post(() -> {
+                binding.appDrawer.setAdapter(appAdapter);
+                GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), MainActivity.calculateNoOfColumns(getActivity()));
+                binding.appDrawer.setLayoutManager(gridLayoutManager);
+                binding.appDrawer.setHasFixedSize(true);
+            });
+            loaded = true;
+        }).start();
 
 
         binding.launchButton.setOnClickListener(view1 -> {
@@ -120,13 +128,6 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
         AppSet appSet = new AppSet(appSetName, appIdsList);
         appSetViewModel.insert(appSet);
         binding.inputName.setText(R.string.my_apps);
-    }
-
-
-    public int calculateNoOfColumns(Context context) {
-        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        return (int) (dpWidth / 80);
     }
 
 

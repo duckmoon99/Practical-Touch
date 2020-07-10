@@ -1,11 +1,13 @@
 package com.example.practicaltouch;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -141,5 +143,11 @@ public class MainActivity extends AppCompatActivity{
 
             Toast.makeText(this, "AppSet updated", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public static int calculateNoOfColumns(Context context) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        return (int) (dpWidth / 80);
     }
 }

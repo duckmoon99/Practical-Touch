@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Build;
+import android.util.Log;
 
 import com.example.practicaltouch.ui.main.AppDrawerItem;
 
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AppsList {
+    private static String TAG = "apps_list";
     private static volatile AppsList instance;
     private List<ResolveInfo> listOfInstalledApps;
     private List<AppDrawerItem> listOfAppDrawerItem;
@@ -21,8 +23,16 @@ public class AppsList {
             throw new RuntimeException("Use getInstance() method to get the single instance of this class.");
         }
         this.packageManager = packageManager;
+
+        long startTime = System.nanoTime();
         setUpResolveInfo();
+        long endTime = System.nanoTime();
+        Log.i(TAG, String.format("AppsList: set up resolve info %d ms used", (endTime-startTime)/1000000));
+        startTime = System.nanoTime();
         setUpAppSets();
+        endTime = System.nanoTime();
+        Log.i(TAG, String.format("AppsList: set up app sets %d ms used", (endTime-startTime)/1000000));
+
         this.packageManager = null;
     }
 
