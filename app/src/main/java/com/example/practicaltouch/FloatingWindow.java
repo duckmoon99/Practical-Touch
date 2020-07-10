@@ -48,14 +48,12 @@ public class FloatingWindow extends Service {
     WindowManager.LayoutParams updatepar;
     private PackageManager packageManager;
 
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
         started = true;
-
-        NotificationChannel channel = null;
         Intent homeIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, homeIntent, 0);
+        NotificationChannel channel = null;
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             int importance = NotificationManager.IMPORTANCE_LOW;
