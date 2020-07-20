@@ -25,4 +25,7 @@ public interface AppSetDAO {
 
     @Query("SELECT * FROM appset_table ORDER BY id DESC")
     LiveData<List<AppSet>> getAllAppSets();
+
+    @Query("SELECT * FROM appset_table ORDER BY id DESC")
+    List<AppSet> getList();
 }

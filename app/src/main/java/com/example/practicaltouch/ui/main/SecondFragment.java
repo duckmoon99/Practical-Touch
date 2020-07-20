@@ -53,19 +53,18 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
 
     //adds an app to the tray (make sure to check if it is already in listOfAppId)
     private void addApp(String appId){
-        Drawable icon = null;
         try {
-            icon = packageManager.getApplicationIcon(appId);
+            Drawable icon = packageManager.getApplicationIcon(appId);
+            final ImageView view2 = (ImageView) getLayoutInflater().inflate(R.layout.appicon, binding.appTray, false);
+            view2.setImageDrawable(icon);
+            view2.setOnClickListener(v2 -> {
+                binding.appTray.removeView(view2);
+                listOfAppIds.remove(appId);
+            });
+            binding.appTray.addView(view2);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        final ImageView view2 = (ImageView) getLayoutInflater().inflate(R.layout.appicon, binding.appTray, false);
-        view2.setImageDrawable(icon);
-        view2.setOnClickListener(v2 -> {
-            binding.appTray.removeView(view2);
-            listOfAppIds.remove(appId);
-        });
-        binding.appTray.addView(view2);
     }
 
     @Override

@@ -72,15 +72,14 @@ public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolde
         final ArrayList<String> listOfAppIds = new ArrayList<>(currentAppSet.getAppIdsList().getListOfAppIds());
         int count = listOfAppIds.size();
         for (int i = 0; i < count; i++) {
-            Drawable icon = null;
             try {
-                icon = packageManager.getApplicationIcon(listOfAppIds.get(i));
+                Drawable icon = packageManager.getApplicationIcon(listOfAppIds.get(i));
+                final ImageView view2 = (ImageView) layoutInflater.inflate(R.layout.appicon, holder.appTray, false);
+                view2.setImageDrawable(icon);
+                holder.appTray.addView(view2);
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
-            final ImageView view2 = (ImageView) layoutInflater.inflate(R.layout.appicon, holder.appTray, false);
-            view2.setImageDrawable(icon);
-            holder.appTray.addView(view2);
         }
 
         holder.dropDownMenu.setOnClickListener(v -> {
