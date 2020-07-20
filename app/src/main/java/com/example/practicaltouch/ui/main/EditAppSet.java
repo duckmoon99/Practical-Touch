@@ -2,6 +2,7 @@ package com.example.practicaltouch.ui.main;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import android.content.Intent;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import com.example.practicaltouch.MainActivity;
 import com.example.practicaltouch.R;
 
+import com.example.practicaltouch.database.AppSetViewModel;
 import com.example.practicaltouch.database.AppsList;
 import com.example.practicaltouch.databinding.EditAppsetBinding;
 
@@ -37,8 +39,6 @@ public class EditAppSet extends AppCompatActivity implements AppAdapter.OnAppLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Toast.makeText(this, "Loading app menu", Toast.LENGTH_SHORT).show();
 
         binding = EditAppsetBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

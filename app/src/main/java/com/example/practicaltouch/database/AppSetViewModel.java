@@ -15,6 +15,15 @@ public class AppSetViewModel extends AndroidViewModel {
     private AppSetRepository repository;
     private LiveData<List<AppSet>> allAppSets;
     private MutableLiveData<Boolean> scrollUp;
+    private boolean loaded;
+
+    public boolean isLoaded(){
+        return loaded;
+    }
+
+    public void loaded(){
+        loaded = true;
+    }
 
     private ArrayList<String> listOfAppIds = new ArrayList<>();
 

@@ -37,7 +37,6 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
     private AppSetViewModel appSetViewModel;
     private PackageManager packageManager;
     private ArrayList<String> listOfAppIds;
-    private boolean loaded;
 
     @Nullable
     @Override
@@ -74,21 +73,23 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if(!loaded){
-            Toast.makeText(getContext(), "Loading app menu", Toast.LENGTH_SHORT).show();
+        if(!appSetViewModel.isLoaded()){
+            Toast.makeText(getContext(), "Loading", Toast.LENGTH_SHORT).show();
+            appSetViewModel.loaded();
         }
         packageManager = Objects.requireNonNull(getActivity()).getPackageManager();
         loadList();
         new Thread(() -> {
             AppAdapter appAdapter = new AppAdapter(getActivity(),
                     AppsList.getInstance(packageManager).getListOfAppDrawerItems(), SecondFragment.this);
-            binding.appDrawer.post(() -> {
-                binding.appDrawer.setAdapter(appAdapter);
-                GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), MainActivity.calculateNoOfColumns(getActivity()));
-                binding.appDrawer.setLayoutManager(gridLayoutManager);
-                binding.appDrawer.setHasFixedSize(true);
-            });
-            loaded = true;
+            if(binding != null) {
+                binding.appDrawer.post(() -> {
+                    binding.appDrawer.setAdapter(appAdapter);
+                    GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), MainActivity.calculateNoOfColumns(getActivity()));
+                    binding.appDrawer.setLayoutManager(gridLayoutManager);
+                    binding.appDrawer.setHasFixedSize(true);
+                });
+            }
         }).start();
 
 

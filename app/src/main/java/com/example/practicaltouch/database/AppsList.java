@@ -24,14 +24,8 @@ public class AppsList {
         }
         this.packageManager = packageManager;
 
-        long startTime = System.nanoTime();
         setUpResolveInfo();
-        long endTime = System.nanoTime();
-        Log.i(TAG, String.format("AppsList: set up resolve info %d ms used", (endTime-startTime)/1000000));
-        startTime = System.nanoTime();
         setUpAppSets();
-        endTime = System.nanoTime();
-        Log.i(TAG, String.format("AppsList: set up app sets %d ms used", (endTime-startTime)/1000000));
 
         this.packageManager = null;
     }
