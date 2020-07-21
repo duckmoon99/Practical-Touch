@@ -31,7 +31,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE= 2323;
     ActivityMainBinding binding;
     AppSetViewModel appSetViewModel;
     AlertDialog alert;
@@ -67,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 startService(startIntent);
             }
-
         } else {
             reqPermission();
         }

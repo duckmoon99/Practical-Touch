@@ -1,6 +1,7 @@
 package com.example.practicaltouch.ui.main;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
@@ -35,6 +36,7 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
     private AppSetViewModel appSetViewModel;
     private PackageManager packageManager;
     private ArrayList<String> listOfAppIds;
+    private String dynamicName;
 
     @Nullable
     @Override
@@ -46,13 +48,13 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
     }
 
     private void loadList() {
-        for(String appId: listOfAppIds){
+        for (String appId : listOfAppIds) {
             addApp(appId);
         }
     }
 
     //adds an app to the tray (make sure to check if it is already in listOfAppId)
-    private void addApp(String appId){
+    private void addApp(String appId) {
         try {
             Drawable icon = packageManager.getApplicationIcon(appId);
             final ImageView view2 = (ImageView) getLayoutInflater().inflate(R.layout.appicon, binding.appTray, false);
@@ -86,18 +88,40 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
         binding.launchButton.setOnClickListener(view1 -> {
             if (listOfAppIds.isEmpty()) {
                 Toast.makeText(getActivity(), "Please select at least an application", Toast.LENGTH_SHORT).show();
-            }
-            else if (binding.inputName.getText().toString().trim().equals("")) {
-                Toast.makeText(getActivity(), "Please input a title", Toast.LENGTH_SHORT).show();
-            }
-            else {
+            } else {
+                if (binding.inputName.getText().toString().trim().equals("")) {
+                    StringBuilder s = new StringBuilder();
+                    int count = Math.min(listOfAppIds.size(), 3);
+                    for (int i = 0; i < count; i++) {
+                        ApplicationInfo ai = null;
+                        try {
+                            ai = packageManager.getApplicationInfo(listOfAppIds.get(i), 0);
+                        } catch (PackageManager.NameNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        if (ai != null) {
+                            s.append((String) packageManager.getApplicationLabel(ai)).append(", ");
+                        } else {
+                            s.append("Unknown").append(", ");
+                        }
+                    }
+                    dynamicName = s.toString().trim();
+                    if (dynamicName.charAt(dynamicName.length() - 1) == ',') {
+                        dynamicName = dynamicName.substring(0, dynamicName.length() - 1);
+                    }
+                    if (dynamicName.length() > 20) {
+                        dynamicName = dynamicName.substring(0, 17) + "...";
+                    }
+                } else {
+                    dynamicName = binding.inputName.getText().toString().trim();
+                }
                 saveAppSet(listOfAppIds);
                 ((MainActivity) Objects.requireNonNull(getActivity())).start_stop(listOfAppIds);
                 listOfAppIds.clear();
                 binding.appTray.removeAllViews();
                 appSetViewModel.setScrollUpTrue();
             }
-        });
+            });
 
         binding.appTray.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
             int newRight = right - oldRight;
@@ -114,11 +138,10 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
     }
 
     private void saveAppSet(ArrayList<String> listOfAppIds) {
-        String appSetName = binding.inputName.getText().toString();
         AppIdsList appIdsList = new AppIdsList(listOfAppIds);
-        AppSet appSet = new AppSet(appSetName, appIdsList);
+        AppSet appSet = new AppSet(dynamicName, appIdsList);
         appSetViewModel.insert(appSet);
-        binding.inputName.setText(R.string.my_apps);
+        binding.inputName.setText("");
     }
 
 
@@ -133,7 +156,7 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
     public void onAppClick(int position) {
         ResolveInfo resolveInfo = AppsList.getInstance(packageManager).getResolveInfoAt(position);
         String appId = resolveInfo.activityInfo.packageName;
-        if(listOfAppIds.contains(appId)) return;
+        if (listOfAppIds.contains(appId)) return;
         listOfAppIds.add(appId);
         addApp(appId);
     }
