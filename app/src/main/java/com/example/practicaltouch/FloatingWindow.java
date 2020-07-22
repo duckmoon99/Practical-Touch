@@ -30,6 +30,8 @@ import androidx.core.app.NotificationCompat;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static java.lang.Math.min;
+
 public class FloatingWindow extends Service {
     private final IBinder binder = new LocalBinder();
 
@@ -55,6 +57,7 @@ public class FloatingWindow extends Service {
     LinearLayout trayLayer;
     LinearLayout appTray;
     HorizontalScrollView appTrayContainer;
+    private float density;
 
     Point screenSize = new Point();
     ArrayList<String> appList;
@@ -91,7 +94,7 @@ public class FloatingWindow extends Service {
 
         appList = intent.getStringArrayListExtra("com.example.practicaltouch.addedApp");
         assert appList != null;
-        openapp = new BubbleImageView(this);
+        openapp = new BubbleImageView(this, dtp(60));
 
         frontLayer.addView(openapp);
         windowManager.addView(frontLayer, params);
@@ -114,13 +117,21 @@ public class FloatingWindow extends Service {
                         backLayer.addView(crossIcon);
                         break;
                     case MotionEvent.ACTION_UP:
+                        updatepar.y = min(updatepar.y, screenSize.y - dtp(70));
+                        int x_tolerance = 35;
+                        int y_tolerance = 35;
+                        int x_error = Math.abs(ptd(updatepar.x - screenSize.x / 2) + 30);
+                        int y_error = ptd(Math.abs(screenSize.y - updatepar.y)) - 70;
+
+                        //Log.i(tag, String.format("x tolerance:%d x difference:%d",  x_tolerance, x_error));
+                        //Log.i(tag, String.format("y tolerance:%d y difference:%d",  y_tolerance, y_error));
                         backLayer.removeView(crossIcon);
                         windowManager.updateViewLayout(frontLayer, updatepar);
-                        if (Math.abs(screenSize.y - updatepar.y) <= 350 && Math.abs(updatepar.x - screenSize.x / 2) <= 300) {
+                        if (y_error <= y_tolerance && x_error <= x_tolerance) {
                             stopSelf();
                         } else {
                             if (updatepar.x >= screenSize.x / 2) {
-                                updatepar.x = screenSize.x - 150;
+                                updatepar.x = screenSize.x - dtp(60);
                             } else {
                                 updatepar.x = 0;
                             }
@@ -163,7 +174,15 @@ public class FloatingWindow extends Service {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        boolean left = updatepar.x >= screenSize.x / 2;
         windowManager.getDefaultDisplay().getSize(screenSize);
+        if (left) {
+            updatepar.x = screenSize.x - dtp(60);
+        } else {
+            updatepar.x = 0;
+        }
+        updatepar.y = min(updatepar.y, screenSize.y - dtp(60));
+        windowManager.updateViewLayout(frontLayer, updatepar);
     }
 
     @Override
@@ -173,6 +192,7 @@ public class FloatingWindow extends Service {
         packageManager = getPackageManager();
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         assert windowManager != null;
+        density = getResources().getDisplayMetrics().density;
 
         windowManager.getDefaultDisplay().getSize(screenSize);
         frontLayer = new LinearLayout(this);
@@ -204,8 +224,8 @@ public class FloatingWindow extends Service {
                 PixelFormat.TRANSLUCENT);
 
         crossIcon = new ImageView(this);
-        crossIcon.setImageResource(R.mipmap.floating_cross_foreground);
-        crossIcon.setLayoutParams(new ViewGroup.LayoutParams(200, 200));
+        crossIcon.setImageResource(R.drawable.cross);
+        crossIcon.setLayoutParams(new ViewGroup.LayoutParams(dtp(60), dtp(60)));
         crossParam.gravity = Gravity.BOTTOM;
 
         windowManager.addView(backLayer, crossParam);
@@ -237,5 +257,14 @@ public class FloatingWindow extends Service {
 
     public static boolean hasStarted() {
         return started;
+    }
+
+    //converts dp to corresponding pixel value
+    private int dtp(int x){
+        return (int) (x*density);
+    }
+
+    private int ptd(int x){
+        return (int) (x/density);
     }
 }
