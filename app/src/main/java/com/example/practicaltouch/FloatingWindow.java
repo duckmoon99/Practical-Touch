@@ -167,6 +167,7 @@ public class FloatingWindow extends Service {
 
     public void update(ArrayList<String> appList){
         if(openapp.isOpen()) appTrayContainer.removeView(appTray);
+        appTray.removeAllViews();
         appTray = new AppTray(this, appList, packageManager);
         if(openapp.isOpen()) appTrayContainer.addView(appTray);
     }
