@@ -69,10 +69,10 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         if (mBound) {
-            Toast.makeText(mService, "Application Set updated", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(mService, "Application Set updated", Toast.LENGTH_SHORT).show();
             mService.update(s);
         } else {
-            Toast.makeText(this, "Application Set launched!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "AppSet launched", Toast.LENGTH_SHORT).show();
             Intent startIntent = new Intent(MainActivity.this, FloatingWindow.class).putStringArrayListExtra("com.example.practicaltouch.addedApp", s);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(startIntent);

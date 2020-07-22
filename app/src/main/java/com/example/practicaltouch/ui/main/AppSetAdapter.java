@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.practicaltouch.FloatingWindow;
 import com.example.practicaltouch.MainActivity;
 import com.example.practicaltouch.R;
 import com.example.practicaltouch.database.AppSet;
@@ -73,9 +74,20 @@ public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolde
         int count = listOfAppIds.size();
         for (int i = 0; i < count; i++) {
             try {
-                Drawable icon = packageManager.getApplicationIcon(listOfAppIds.get(i));
+                final String packageName = listOfAppIds.get(i);
+                Drawable icon = packageManager.getApplicationIcon(packageName);
                 final ImageView view2 = (ImageView) layoutInflater.inflate(R.layout.appicon, holder.appTray, false);
                 view2.setImageDrawable(icon);
+                view2.setOnClickListener(v -> {
+                    try {
+                        Intent startApp = packageManager.getLaunchIntentForPackage(packageName);
+                        Toast.makeText(activity, "Launching " + packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageName, 0)), Toast.LENGTH_SHORT).show();
+                        activity.start_stop(listOfAppIds);
+                        activity.startActivity(startApp);
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                });
                 holder.appTray.addView(view2);
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
@@ -105,7 +117,10 @@ public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolde
             popupMenu.show();
         });
 
-        holder.launchButton.setOnClickListener(v -> activity.start_stop(listOfAppIds));
+        holder.launchButton.setOnClickListener(v -> {
+            Toast.makeText(activity, "Active AppSet updated", Toast.LENGTH_SHORT).show();
+            activity.start_stop(listOfAppIds);
+        });
     }
 
     AppSet getAppSetAt(int position) {
