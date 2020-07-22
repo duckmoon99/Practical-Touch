@@ -1,6 +1,8 @@
 package com.example.practicaltouch;
 
 import android.app.AlertDialog;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -27,7 +29,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
     AppSetViewModel appSetViewModel;
@@ -60,27 +62,28 @@ public class MainActivity extends AppCompatActivity{
             Toast.makeText(this, "Application Set launched!", Toast.LENGTH_SHORT).show();
             Intent startIntent = new Intent(MainActivity.this, FloatingWindow.class).putStringArrayListExtra("com.example.practicaltouch.addedApp", s);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(
-                        startIntent);
+                startForegroundService(startIntent);
             } else {
                 startService(startIntent);
             }
-
         } else {
             reqPermission();
         }
     }
 
-    private void reqPermission(){
+    private void reqPermission() {
         final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setCancelable(true);
         alertBuilder.setTitle("Screen overlay detected");
         alertBuilder.setMessage("Enable 'Draw over other apps' in your system setting.");
         alertBuilder.setPositiveButton("OPEN SETTINGS", (dialog, which) -> {
             // warning below
-            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + getPackageName()));
-            startActivityForResult(intent,RESULT_OK);
+            Intent intent = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+            }
+            startActivityForResult(intent, RESULT_OK);
         });
 
         alert = alertBuilder.create();
@@ -141,5 +144,14 @@ public class MainActivity extends AppCompatActivity{
 
             Toast.makeText(this, "AppSet updated", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(
+                new ComponentName(this, AppSetWidgetProvider.class));
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.appset_listview_widget);
+        super.onPause();
     }
 }

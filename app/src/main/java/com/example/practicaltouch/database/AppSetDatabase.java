@@ -15,7 +15,7 @@ public abstract class AppSetDatabase extends RoomDatabase {
 
     public abstract AppSetDAO appSetDAO();
 
-    static synchronized AppSetDatabase getInstance(Context context) {
+    public static synchronized AppSetDatabase getInstance(Context context) {
         if (instance == null) {
             instance = Room.databaseBuilder(context.getApplicationContext(),
                     AppSetDatabase.class, "appset_database")
