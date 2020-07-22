@@ -14,6 +14,7 @@ import android.graphics.Point;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,6 +30,7 @@ import androidx.core.app.NotificationCompat;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.min;
 
 public class FloatingWindow extends Service {
@@ -46,7 +48,7 @@ public class FloatingWindow extends Service {
         return binder;
     }
 
-    final String tag = "floatingWindow";
+    final String TAG = "floatingWindow";
   
     private static String CHANNEL_ID = "com.example.practicaltouch.channel";
 
@@ -104,7 +106,6 @@ public class FloatingWindow extends Service {
             double y;
             double px;
             double py;
-            boolean moved = false;
 
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -117,6 +118,7 @@ public class FloatingWindow extends Service {
                         backLayer.addView(crossIcon);
                         break;
                     case MotionEvent.ACTION_UP:
+                        openapp.moved = false;
                         updatepar.y = min(updatepar.y, screenSize.y - dtp(70));
                         int x_tolerance = 35;
                         int y_tolerance = 35;
@@ -139,6 +141,12 @@ public class FloatingWindow extends Service {
                         }
                         break;
                     case MotionEvent.ACTION_MOVE:
+
+                        //Log.i(TAG, String.format("onTouch: %d",(int) (motionEvent.getRawX() - px)));
+                        if(abs(ptd((int) (motionEvent.getRawX()-px))) >= 15 || abs(ptd((int) (motionEvent.getRawY()-py))) >= 15){
+                            openapp.moved = true;
+                        }
+
                         updatepar.x = (int) (x-(motionEvent.getRawX()-px));
                         updatepar.y = (int) (y+(motionEvent.getRawY()-py));
                         windowManager.updateViewLayout(frontLayer, updatepar);

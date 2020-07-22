@@ -11,16 +11,20 @@ import android.widget.Toast;
 @SuppressLint("AppCompatCustomView")
 public class BubbleImageView extends ImageView {
     private boolean open;
+    public boolean moved;
 
     public BubbleImageView(Context context, int px) {
         super(context);
         open = false;
+        moved = false;
         setImageResource(R.drawable.logo);
         setLayoutParams(new ViewGroup.LayoutParams(px, px));
         setAlpha((float) 0.4);
         setOnLongClickListener(v -> {
-            context.startActivity(new Intent(context, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-            Toast.makeText(context, "Launching Practical Touch", Toast.LENGTH_SHORT).show();
+            if(!moved) {
+                context.startActivity(new Intent(context, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                Toast.makeText(context, "Launching Practical Touch", Toast.LENGTH_SHORT).show();
+            }
             return true;
         });
     }
