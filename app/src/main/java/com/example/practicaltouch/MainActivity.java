@@ -1,11 +1,14 @@
 package com.example.practicaltouch;
 
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.Menu;
@@ -37,7 +40,6 @@ public class MainActivity extends AppCompatActivity{
     private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2};
     public static final int EDIT_APPSET_REQUEST = 1;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,26 +54,47 @@ public class MainActivity extends AppCompatActivity{
         setSupportActionBar(binding.toolbar);
 
         appSetViewModel = new ViewModelProvider(this).get(AppSetViewModel.class);
+        if(FloatingWindow.hasStarted()){
+            bindService(new Intent(this, FloatingWindow.class), connection, 0);
+        }
     }
 
+    FloatingWindow mService;
+    private boolean mBound = false;
+
     public void start_stop(ArrayList<String> s) {
-        if (checkPermission()) {
-            if (FloatingWindow.hasStarted()) {
-                stopService(new Intent(MainActivity.this, FloatingWindow.class));
-            }
+        if(!checkPermission()){
+            reqPermission();
+            return;
+        }
+        if (mBound) {
+            Toast.makeText(mService, "Application Set updated", Toast.LENGTH_SHORT).show();
+            mService.update(s);
+        } else {
             Toast.makeText(this, "Application Set launched!", Toast.LENGTH_SHORT).show();
             Intent startIntent = new Intent(MainActivity.this, FloatingWindow.class).putStringArrayListExtra("com.example.practicaltouch.addedApp", s);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(
-                        startIntent);
+                startForegroundService(startIntent);
             } else {
                 startService(startIntent);
             }
-
-        } else {
-            reqPermission();
+            bindService(startIntent, connection, 0);
         }
     }
+
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            FloatingWindow.LocalBinder binder = (FloatingWindow.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mBound = false;
+        }
+    };
 
     private void reqPermission(){
         final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
