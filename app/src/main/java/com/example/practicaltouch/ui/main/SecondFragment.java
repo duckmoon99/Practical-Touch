@@ -96,7 +96,7 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
 
         binding.launchButton.setOnClickListener(view1 -> {
             if (listOfAppIds.isEmpty()) {
-                Toast.makeText(getActivity(), "Please select at least an application", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Please select at least an app", Toast.LENGTH_SHORT).show();
             } else {
                 if (binding.inputName.getText().toString().trim().equals("")) {
                     StringBuilder s = new StringBuilder();
@@ -108,19 +108,14 @@ public class SecondFragment extends Fragment implements AppAdapter.OnAppListener
                         } catch (PackageManager.NameNotFoundException e) {
                             e.printStackTrace();
                         }
+                        if(i > 0) s.append(", ");
                         if (ai != null) {
-                            s.append((String) packageManager.getApplicationLabel(ai)).append(", ");
+                            s.append((String) packageManager.getApplicationLabel(ai));
                         } else {
-                            s.append("Unknown").append(", ");
+                            s.append("Unknown");
                         }
                     }
                     dynamicName = s.toString().trim();
-                    if (dynamicName.charAt(dynamicName.length() - 1) == ',') {
-                        dynamicName = dynamicName.substring(0, dynamicName.length() - 1);
-                    }
-                    if (dynamicName.length() > 20) {
-                        dynamicName = dynamicName.substring(0, 17) + "...";
-                    }
                 } else {
                     dynamicName = binding.inputName.getText().toString().trim();
                 }

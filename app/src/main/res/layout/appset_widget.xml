@@ -5,15 +5,17 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android">
+
     <TextView
         android:id="@+id/appset_textview_widget"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textColor="#000"
-        android:background="@color/design_default_color_background"
+        android:background="@color/design_default_color_primary"
         android:padding="8dp"
-        />
+        android:text="@string/app_name"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold" />
 
     <ListView
         android:id="@+id/appset_listview_widget"
