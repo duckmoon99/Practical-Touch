@@ -2,6 +2,7 @@ package com.example.practicaltouch.ui.main;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import android.content.Intent;
@@ -16,8 +17,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.practicaltouch.MainActivity;
 import com.example.practicaltouch.R;
 
+import com.example.practicaltouch.database.AppSetViewModel;
 import com.example.practicaltouch.database.AppsList;
 import com.example.practicaltouch.databinding.EditAppsetBinding;
 
@@ -64,12 +67,16 @@ public class EditAppSet extends AppCompatActivity implements AppAdapter.OnAppLis
             binding.editAppTray.addView(view2);
         }
 
-        AppAdapter appAdapter = new AppAdapter(this,
-                AppsList.getInstance(getPackageManager()).getListOfAppDrawerItems(), this);
-        binding.editAppDrawer.setAdapter(appAdapter);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4);
-        binding.editAppDrawer.setLayoutManager(gridLayoutManager);
-        binding.editAppDrawer.setHasFixedSize(true);
+        new Thread(() -> {
+            AppAdapter appAdapter = new AppAdapter(EditAppSet.this,
+                    AppsList.getInstance(getPackageManager()).getListOfAppDrawerItems(), EditAppSet.this);
+            binding.editAppDrawer.post(() -> {
+                binding.editAppDrawer.setAdapter(appAdapter);
+                GridLayoutManager gridLayoutManager = new GridLayoutManager(EditAppSet.this, MainActivity.calculateNoOfColumns(getApplicationContext()));
+                binding.editAppDrawer.setLayoutManager(gridLayoutManager);
+                binding.editAppDrawer.setHasFixedSize(true);
+            });
+        }).start();
 
         binding.editAppTray.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
             int newRight = right - oldRight;

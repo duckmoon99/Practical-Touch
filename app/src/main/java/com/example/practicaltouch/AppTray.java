@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -17,12 +18,14 @@ public class AppTray extends LinearLayout {
             ImageView current = new ImageView(context);
             try {
                 current.setImageDrawable(packageManager.getApplicationIcon(s));
-                current.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent startApp = packageManager.getLaunchIntentForPackage(s);
-                        context.startActivity(startApp);
+                current.setOnClickListener(view -> {
+                    try {
+                        Toast.makeText(context, "Launching " + packageManager.getApplicationLabel(packageManager.getApplicationInfo(s, 0)), Toast.LENGTH_SHORT).show();
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
                     }
+                    Intent startApp = packageManager.getLaunchIntentForPackage(s);
+                    context.startActivity(startApp);
                 });
                 current.setLayoutParams(new ViewGroup.LayoutParams(180, 180));
                 current.setPadding(16, 0, 16, 0);
