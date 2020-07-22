@@ -14,7 +14,6 @@ import android.graphics.Point;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -48,6 +47,7 @@ public class FloatingWindow extends Service {
     }
 
     final String tag = "floatingWindow";
+  
     private static String CHANNEL_ID = "com.example.practicaltouch.channel";
 
     private static boolean started = false;

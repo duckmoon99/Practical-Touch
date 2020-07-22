@@ -3,6 +3,7 @@ package com.example.practicaltouch;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.Uri;
@@ -32,7 +33,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
     AppSetViewModel appSetViewModel;
@@ -103,9 +104,12 @@ public class MainActivity extends AppCompatActivity{
         alertBuilder.setMessage("Enable 'Draw over other apps' in your system setting.");
         alertBuilder.setPositiveButton("OPEN SETTINGS", (dialog, which) -> {
             // warning below
-            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + getPackageName()));
-            startActivityForResult(intent,RESULT_OK);
+            Intent intent = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+            }
+            startActivityForResult(intent, RESULT_OK);
         });
 
         alert = alertBuilder.create();
@@ -167,10 +171,19 @@ public class MainActivity extends AppCompatActivity{
             Toast.makeText(this, "AppSet updated", Toast.LENGTH_SHORT).show();
         }
     }
-
+  
     public static int calculateNoOfColumns(Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         return (int) (dpWidth / 80);
+    }
+  
+    @Override
+    protected void onPause() {
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(
+                new ComponentName(this, AppSetWidgetProvider.class));
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.appset_listview_widget);
+        super.onPause();
     }
 }
