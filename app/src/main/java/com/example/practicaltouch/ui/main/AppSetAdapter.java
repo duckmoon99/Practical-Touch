@@ -117,10 +117,7 @@ public class AppSetAdapter extends ListAdapter<AppSet, AppSetAdapter.AppSetHolde
             popupMenu.show();
         });
 
-        holder.launchButton.setOnClickListener(v -> {
-            Toast.makeText(activity, "Active AppSet updated", Toast.LENGTH_SHORT).show();
-            activity.start_stop(listOfAppIds);
-        });
+        holder.launchButton.setOnClickListener(v -> activity.start_stop(listOfAppIds));
     }
 
     AppSet getAppSetAt(int position) {

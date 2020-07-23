@@ -23,6 +23,7 @@ import android.view.WindowManager;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -71,112 +72,119 @@ public class FloatingWindow extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
-        started = true;
-        Intent homeIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, homeIntent, 0);
-        NotificationChannel channel;
+        if(!hasStarted()) {
+            started = true;
+            Toast.makeText(this, "AppSet Launched", Toast.LENGTH_SHORT).show();
+            Intent homeIntent = new Intent(this, MainActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, homeIntent, 0);
+            NotificationChannel channel;
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            int importance = NotificationManager.IMPORTANCE_LOW;
-            String name = "Status";
-            String description = "Shows if Practical Touch is running.";
-            channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            Objects.requireNonNull(getSystemService(NotificationManager.class)).createNotificationChannel(channel);
-        }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                int importance = NotificationManager.IMPORTANCE_LOW;
+                String name = "Status";
+                String description = "Shows if Practical Touch is running.";
+                channel = new NotificationChannel(CHANNEL_ID, name, importance);
+                channel.setDescription(description);
+                Objects.requireNonNull(getSystemService(NotificationManager.class)).createNotificationChannel(channel);
+            }
 
-        Notification notification = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-                .setSmallIcon(R.mipmap.logo_foreground)
-                .setContentTitle("Practical Touch")
-                .setContentText("Practical Touch is running.")
-                .setContentIntent(pendingIntent)
-                .build();
+            Notification notification = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                    .setSmallIcon(R.mipmap.logo_foreground)
+                    .setContentTitle("Practical Touch")
+                    .setContentText("Practical Touch is running.")
+                    .setContentIntent(pendingIntent)
+                    .build();
 
-        startForeground(1, notification);
+            startForeground(1, notification);
 
-        appList = intent.getStringArrayListExtra("com.example.practicaltouch.addedApp");
-        assert appList != null;
-        openapp = new BubbleImageView(this, dtp(60));
+            appList = intent.getStringArrayListExtra("com.example.practicaltouch.addedApp");
+            assert appList != null;
+            openapp = new BubbleImageView(this, dtp(60));
 
-        frontLayer.addView(openapp);
-        windowManager.addView(frontLayer, params);
+            frontLayer.addView(openapp);
+            windowManager.addView(frontLayer, params);
 
-        openapp.setOnTouchListener(new View.OnTouchListener() {
-            double x;
-            double y;
-            double px;
-            double py;
+            openapp.setOnTouchListener(new View.OnTouchListener() {
+                double x;
+                double y;
+                double px;
+                double py;
 
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()){
-                    case MotionEvent.ACTION_DOWN:
-                        x = updatepar.x;
-                        y = updatepar.y;
-                        px = motionEvent.getRawX();
-                        py = motionEvent.getRawY();
-                        backLayer.addView(crossIcon);
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        openapp.moved = false;
-                        updatepar.y = min(updatepar.y, screenSize.y - dtp(70));
-                        int x_tolerance = 35;
-                        int y_tolerance = 35;
-                        int x_error = Math.abs(ptd(updatepar.x - screenSize.x / 2) + 30);
-                        int y_error = ptd(Math.abs(screenSize.y - updatepar.y)) - 70;
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    switch (motionEvent.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            x = updatepar.x;
+                            y = updatepar.y;
+                            px = motionEvent.getRawX();
+                            py = motionEvent.getRawY();
+                            backLayer.addView(crossIcon);
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            openapp.moved = false;
+                            updatepar.y = min(updatepar.y, screenSize.y - dtp(70));
+                            int x_tolerance = 35;
+                            int y_tolerance = 35;
+                            int x_error = Math.abs(ptd(updatepar.x - screenSize.x / 2) + 30);
+                            int y_error = ptd(Math.abs(screenSize.y - updatepar.y)) - 70;
 
-                        //Log.i(tag, String.format("x tolerance:%d x difference:%d",  x_tolerance, x_error));
-                        //Log.i(tag, String.format("y tolerance:%d y difference:%d",  y_tolerance, y_error));
-                        backLayer.removeView(crossIcon);
-                        windowManager.updateViewLayout(frontLayer, updatepar);
-                        if (y_error <= y_tolerance && x_error <= x_tolerance) {
-                            stopSelf();
-                        } else {
-                            if (updatepar.x >= screenSize.x / 2) {
-                                updatepar.x = screenSize.x - dtp(60);
-                            } else {
-                                updatepar.x = 0;
-                            }
+                            //Log.i(tag, String.format("x tolerance:%d x difference:%d",  x_tolerance, x_error));
+                            //Log.i(tag, String.format("y tolerance:%d y difference:%d",  y_tolerance, y_error));
+                            backLayer.removeView(crossIcon);
                             windowManager.updateViewLayout(frontLayer, updatepar);
-                        }
-                        break;
-                    case MotionEvent.ACTION_MOVE:
+                            if (y_error <= y_tolerance && x_error <= x_tolerance) {
+                                stopSelf();
+                            } else {
+                                if (updatepar.x >= screenSize.x / 2) {
+                                    updatepar.x = screenSize.x - dtp(60);
+                                } else {
+                                    updatepar.x = 0;
+                                }
+                                windowManager.updateViewLayout(frontLayer, updatepar);
+                            }
+                            break;
+                        case MotionEvent.ACTION_MOVE:
 
-                        //Log.i(TAG, String.format("onTouch: %d",(int) (motionEvent.getRawX() - px)));
-                        if(abs(ptd((int) (motionEvent.getRawX()-px))) >= 15 || abs(ptd((int) (motionEvent.getRawY()-py))) >= 15){
-                            openapp.moved = true;
-                        }
+                            //Log.i(TAG, String.format("onTouch: %d",(int) (motionEvent.getRawX() - px)));
+                            if (abs(ptd((int) (motionEvent.getRawX() - px))) >= 15 || abs(ptd((int) (motionEvent.getRawY() - py))) >= 15) {
+                                openapp.moved = true;
+                            }
 
-                        updatepar.x = (int) (x-(motionEvent.getRawX()-px));
-                        updatepar.y = (int) (y+(motionEvent.getRawY()-py));
-                        windowManager.updateViewLayout(frontLayer, updatepar);
-                    default:
-                        break;
+                            updatepar.x = (int) (x - (motionEvent.getRawX() - px));
+                            updatepar.y = (int) (y + (motionEvent.getRawY() - py));
+                            windowManager.updateViewLayout(frontLayer, updatepar);
+                        default:
+                            break;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
 
-        openapp.setOnClickListener(view -> {
-            if (openapp.isOpen()) {
-                appTrayContainer.removeView(appTray);
-            } else {
-                appTrayContainer.addView(appTray);
-            }
-            openapp.toggle();
-        });
+            openapp.setOnClickListener(view -> {
+                if (openapp.isOpen()) {
+                    appTrayContainer.removeView(appTray);
+                } else {
+                    appTrayContainer.addView(appTray);
+                }
+                openapp.toggle();
+            });
 
-        appTray = new AppTray(this, appList, packageManager);
-        appTrayContainer = new HorizontalScrollView(this);
+            appTray = new AppTray(this, appList, packageManager, dtp(60), dtp(8));
+            appTrayContainer = new HorizontalScrollView(this);
 
-        trayLayer.addView(appTrayContainer);
+            trayLayer.addView(appTrayContainer);
+        }else{
+            Toast.makeText(this, "Active AppSet updated", Toast.LENGTH_SHORT).show();
+            update(intent.getStringArrayListExtra("com.example.practicaltouch.addedApp"));
+        }
         return START_REDELIVER_INTENT;
     }
 
     public void update(ArrayList<String> appList){
+        Toast.makeText(this, "Active AppSet updated", Toast.LENGTH_SHORT).show();
         if(openapp.isOpen()) appTrayContainer.removeView(appTray);
         appTray.removeAllViews();
-        appTray = new AppTray(this, appList, packageManager);
+        appTray = new AppTray(this, appList, packageManager, dtp(60), dtp(8));
         if(openapp.isOpen()) appTrayContainer.addView(appTray);
     }
 

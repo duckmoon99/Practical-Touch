@@ -2,13 +2,13 @@
     <string name="app_name">Practical Touch</string>
     <string name="tab_text_1">Created Sets</string>
     <string name="tab_text_2">Create New</string>
-    <string name="launch_button">Launch</string>
+    <string name="launch_button">LAUNCH</string>
     <string name="appicon_desc">An AppIcon</string>
     <string name="delete_all_appsets">Delete all AppSets</string>
     <string name="appdraweritem_appicon">An AppIcon in an AppDrawer</string>
     <string name="appdraweritem_appname">An AppName in an AppDrawer</string>
     <string name="my_apps">My Apps</string>
-    <string name="appset_title">Insert AppSet Name (default is the list)</string>
+    <string name="appset_title">Insert AppSet Name (default is list)</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="save">Save</string>
