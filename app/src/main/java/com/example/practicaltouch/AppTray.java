@@ -12,7 +12,7 @@ import android.widget.Toast;
 import java.util.List;
 
 public class AppTray extends LinearLayout {
-    public AppTray(final Context context, List<String> appList, final PackageManager packageManager) {
+    public AppTray(final Context context, List<String> appList, final PackageManager packageManager, int sz, int pad) {
         super(context);
         for (final String s: appList) {
             ImageView current = new ImageView(context);
@@ -27,8 +27,8 @@ public class AppTray extends LinearLayout {
                     Intent startApp = packageManager.getLaunchIntentForPackage(s);
                     context.startActivity(startApp);
                 });
-                current.setLayoutParams(new ViewGroup.LayoutParams(180, 180));
-                current.setPadding(16, 0, 16, 0);
+                current.setLayoutParams(new LayoutParams(sz+pad, sz));
+                current.setPadding(pad, 0, 0, 0);
                 addView(current);
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();

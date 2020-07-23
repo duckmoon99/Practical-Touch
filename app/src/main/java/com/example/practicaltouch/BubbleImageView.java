@@ -47,5 +47,4 @@ public class BubbleImageView extends ImageView {
     public boolean isOpen() {
         return open;
     }
-
 }

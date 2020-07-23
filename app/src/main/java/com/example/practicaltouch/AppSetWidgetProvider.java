@@ -47,7 +47,6 @@ public class AppSetWidgetProvider extends AppWidgetProvider {
             if (FloatingWindow.hasStarted()) {
                 context.stopService(new Intent(context, FloatingWindow.class));
             }
-            Toast.makeText(context, "Application Set launched!", Toast.LENGTH_SHORT).show();
             Intent startIntent = new Intent(context, FloatingWindow.class).putStringArrayListExtra("com.example.practicaltouch.addedApp", s);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(startIntent);
