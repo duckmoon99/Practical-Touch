@@ -2,7 +2,9 @@
 
 ## Introduction
 
-We are creating an alternative overlay as a mean of navigating between apps as our submission for the NUS Orbital Program. It is currently a WIP, and we expect to complete it by the end of July 2020.
+We are creating an alternative overlay as a mean of navigating between apps as our submission for the NUS Orbital Program. App can now be downloaded at http://bit.ly/practical-touch (when installing, Android will warn that they do not know the developer, this is just because we did not upload the app to Google Play, just click “Install Anyway”)
+
+Strongly recommended to watch our video at https://drive.google.com/file/d/1u4VU9Qh85-MS8TNZ6stjA9syLK0Lz3gV/view?usp=sharing to make it easier to understand how our app works.
 
 ## Problem Motivation 
 
@@ -70,18 +72,31 @@ Some QoL changes include:
 - Added notification and modifies service to be foreground (to prevent our application from being killed when the user closes his phone). 
 - Added delete all AppSets functionality. 
 
-Features to be completed in Milestone 3:
+Features completed in milestone 3:
 
 | Features        | Description                                                                                                                                                                                                                                                                                          |
 |-----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Widget          | An even more convenient feature we intend to implement where the users do not have to open our application to launch their desired AppSets. Instead, they can assign a widget icon to an AppSet, so that they can launch that AppSet directly from the home screen without going to Practical Touch. |
-| Movable AppSets | Allow users to manually move the position of the AppSets in the list.                                                                                                                                                                                                                                |
+| Widget          | An even more convenient feature we implemented where the users do not have to open our application to launch their desired AppSets. Instead, they can initialise our widget which has their list of created AppSets displayed as a list to them. |
+
+Major QoL changes include:
+
+- Process app drawer in new thread instead of the main app (which have caused the app to be not responding previously)
+
+- Concise Toast messages to give feedback to users to let them know what the app is doing
+
+- Bound service to update the active appset seamlessly, which allows user to access app even faster (instead of having to reposition the dock every time launching a new appset)
+
+- Allows app to be launched straight from the created set menu, which updates the active appset too
+
+- Fix any crashes reported from users testing and self testing
 
 ## Challenges faced
 
 When implementing the app drawer to include the names, the app was noticeably laggy during scrolling. We solved this by using Android Jetpack’s RecyclerView library.
 
 There were also some bugs regarding configuration changes (for example, screen rotation) where the selected apps will disappear. This is due to the logic of the tray being handled in the activity of that page, which turns out to get destroyed and rebuilt when there is a configuration change such as screen rotating. This was solved by storing the data in the activity’s viewmodel and making our layouts observe data from there.
+
+Preprocessing the app drawer (getting all the application info, sorting by name etc) takes time and would cause the app to not respond while loading. This may disway potential users from trying out the app. To fix this, we learned about threading on Android and have managed to move the necessary processing to the new thread, so as to not hog the main thread, which is the UI thread responsible for making the app responding.
 
 ## Tech Stack
 
