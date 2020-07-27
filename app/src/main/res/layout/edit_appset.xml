@@ -42,17 +42,18 @@
     <EditText
         android:id="@+id/edit_input_name"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="18dp"
         android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:background="@android:color/transparent"
         android:hint="@string/appset_title"
         android:importantForAutofill="no"
         android:inputType="text"
-        android:maxLength="20"
         android:paddingBottom="0dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
         android:textColor="#808080"
         app:layout_constraintBottom_toTopOf="@+id/edit_scrollbar"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edit_appBarLayout" />
 
